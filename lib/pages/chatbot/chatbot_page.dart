@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../services/ai_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_config_gate.dart';
 
 class ChatMessage {
   ChatMessage({
@@ -151,142 +152,148 @@ class _ChatbotPageState extends State<ChatbotPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surface,
-        elevation: 0,
-        automaticallyImplyLeading: !widget.embedded,
-        leading: widget.embedded
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-                color: Colors.black,
-                onPressed: () => Navigator.pop(context),
-              ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.auto_awesome_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'FinEase AI',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
-                  ),
+    return AppFeatureGate(
+      enabled: (config) => config.chatbotEnabled,
+      blockedTitle: 'AI chatbot is paused',
+      blockedMessage: 'FinEase admin has temporarily paused the AI chatbot.',
+      blockedIcon: Icons.smart_toy_outlined,
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        appBar: AppBar(
+          backgroundColor: AppTheme.surface,
+          elevation: 0,
+          automaticallyImplyLeading: !widget.embedded,
+          leading: widget.embedded
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                  color: Colors.black,
+                  onPressed: () => Navigator.pop(context),
                 ),
-                Text(
-                  _isTyping ? 'Typing...' : 'Online',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: _isTyping ? AppTheme.warning : AppTheme.success,
-                  ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'FinEase AI',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    _isTyping ? 'Typing...' : 'Online',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: _isTyping ? AppTheme.warning : AppTheme.success,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.refresh_rounded,
+                color: AppTheme.textSecondary,
+              ),
+              onPressed: () => setState(() {
+                _messages
+                  ..clear()
+                  ..add(
+                    ChatMessage(
+                      text: 'Chat cleared. What would you like help with next?',
+                      isUser: false,
+                      timestamp: DateTime.now(),
+                    ),
+                  );
+              }),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.refresh_rounded,
-              color: AppTheme.textSecondary,
-            ),
-            onPressed: () => setState(() {
-              _messages
-                ..clear()
-                ..add(
-                  ChatMessage(
-                    text: 'Chat cleared. What would you like help with next?',
-                    isUser: false,
-                    timestamp: DateTime.now(),
+        body: _validatingConfig
+            ? const Center(child: CircularProgressIndicator())
+            : _configError != null
+            ? _ConfigBlocker(
+                message: _configError!,
+                onRetry: () {
+                  setState(() {
+                    _validatingConfig = true;
+                    _configError = null;
+                  });
+                  _initializeChatbot();
+                },
+              )
+            : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      itemCount: _messages.length + (_isTyping ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == _messages.length) {
+                          return const _TypingIndicator();
+                        }
+                        return _Bubble(message: _messages[index]);
+                      },
+                    ),
                   ),
-                );
-            }),
-          ),
-        ],
-      ),
-      body: _validatingConfig
-          ? const Center(child: CircularProgressIndicator())
-          : _configError != null
-          ? _ConfigBlocker(
-              message: _configError!,
-              onRetry: () {
-                setState(() {
-                  _validatingConfig = true;
-                  _configError = null;
-                });
-                _initializeChatbot();
-              },
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    itemCount: _messages.length + (_isTyping ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == _messages.length) {
-                        return const _TypingIndicator();
-                      }
-                      return _Bubble(message: _messages[index]);
-                    },
-                  ),
-                ),
-                if (_messages.length == 1)
-                  SizedBox(
-                    height: 44,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _prompts.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 8),
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () => _send(_prompts[index]),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.primary.withValues(alpha: 0.3),
+                  if (_messages.length == 1)
+                    SizedBox(
+                      height: 44,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _prompts.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 8),
+                        itemBuilder: (context, index) => GestureDetector(
+                          onTap: () => _send(_prompts[index]),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
                             ),
-                          ),
-                          child: Text(
-                            _prompts[index],
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.primary,
+                            decoration: BoxDecoration(
+                              color: AppTheme.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppTheme.primary.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Text(
+                              _prompts[index],
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppTheme.primary,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                _InputBar(controller: _controller, onSend: _send),
-              ],
-            ),
+                  _InputBar(controller: _controller, onSend: _send),
+                ],
+              ),
+      ),
     );
   }
 }

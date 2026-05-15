@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/app_config.dart';
 import '../../models/saving_goal.dart';
 import '../../models/transaction.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/currency_utils.dart';
+import '../../widgets/app_config_gate.dart';
 import '../budget/ai_budget_advisor_page.dart';
 import '../chatbot/chatbot_page.dart';
 import '../forum/community_forum_page.dart';
@@ -21,7 +23,9 @@ import '../transactions/all_transactions_page.dart';
 import '../welfare/welfare_programs_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.appConfig});
+
+  final AppConfig? appConfig;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -45,6 +49,15 @@ class _HomePageState extends State<HomePage> {
     final firestoreService = authService.firestoreService;
     final user = authService.user;
     final photoUrl = user?.photoURL;
+    final appConfig = widget.appConfig ?? AppConfig.defaults();
+    final primaryColor = appConfigColor(
+      appConfig.primaryColorHex,
+      AppTheme.primary,
+    );
+    final secondaryColor = appConfigColor(
+      appConfig.secondaryColorHex,
+      AppTheme.secondary,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
@@ -63,6 +76,8 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
                   child: _TopBar(
+                    appConfig: appConfig,
+                    primaryColor: primaryColor,
                     photoUrl: photoUrl,
                     isRefreshing: _isRefreshing,
                     onRefresh: () => _refreshKey.currentState?.show(),
@@ -105,6 +120,10 @@ class _HomePageState extends State<HomePage> {
                                         ?.toDouble() ??
                                     income - expense;
                                 return _BalanceCard(
+                                  title: appConfig.homeHeroTitle,
+                                  message: appConfig.homeHeroMessage,
+                                  primaryColor: primaryColor,
+                                  secondaryColor: secondaryColor,
                                   balance: balance,
                                   income:
                                       (summary['monthlyIncome'] as num?)
@@ -146,11 +165,12 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.storefront_rounded,
                         color: const Color(0xFF2E3192),
                         background: const Color(0xFFEEF2FF),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MarketplaceScreen(),
-                          ),
+                        enabled: appConfig.marketplaceEnabled,
+                        onTap: () => _openFeature(
+                          enabled: appConfig.marketplaceEnabled,
+                          title: 'Marketplace is paused',
+                          message: appConfig.supportMessage,
+                          page: const MarketplaceScreen(),
                         ),
                       ),
                       _FeatureItem(
@@ -194,11 +214,12 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.smart_toy_rounded,
                         color: const Color(0xFF475569),
                         background: const Color(0xFFF1F5F9),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChatbotPage(),
-                          ),
+                        enabled: appConfig.chatbotEnabled,
+                        onTap: () => _openFeature(
+                          enabled: appConfig.chatbotEnabled,
+                          title: 'AI chatbot is paused',
+                          message: appConfig.supportMessage,
+                          page: const ChatbotPage(),
                         ),
                       ),
                     ],
@@ -254,11 +275,12 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.volunteer_activism_rounded,
                         color: const Color(0xFFD97706),
                         background: const Color(0xFFFFF7ED),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const WelfareProgramsPage(),
-                          ),
+                        enabled: appConfig.welfareEnabled,
+                        onTap: () => _openFeature(
+                          enabled: appConfig.welfareEnabled,
+                          title: 'Welfare programs are paused',
+                          message: appConfig.supportMessage,
+                          page: const WelfareProgramsPage(),
                         ),
                       ),
                       _FeatureItem(
@@ -266,11 +288,12 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.forum_rounded,
                         color: const Color(0xFF475569),
                         background: const Color(0xFFF1F5F9),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CommunityForumPage(),
-                          ),
+                        enabled: appConfig.forumEnabled,
+                        onTap: () => _openFeature(
+                          enabled: appConfig.forumEnabled,
+                          title: 'Community forum is paused',
+                          message: appConfig.supportMessage,
+                          page: const CommunityForumPage(),
                         ),
                       ),
                     ],
@@ -410,16 +433,36 @@ class _HomePageState extends State<HomePage> {
     }
     return total;
   }
+
+  void _openFeature({
+    required bool enabled,
+    required String title,
+    required String message,
+    required Widget page,
+  }) {
+    if (!enabled) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$title. $message')));
+      return;
+    }
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  }
 }
 
 class _TopBar extends StatelessWidget {
   const _TopBar({
+    required this.appConfig,
+    required this.primaryColor,
     required this.photoUrl,
     required this.isRefreshing,
     required this.onRefresh,
     required this.onProfileTap,
   });
 
+  final AppConfig appConfig;
+  final Color primaryColor;
   final String? photoUrl;
   final bool isRefreshing;
   final VoidCallback onRefresh;
@@ -441,79 +484,96 @@ class _TopBar extends StatelessWidget {
             ? 'Administrator'
             : (profile['isDemoAccount'] == true
                   ? 'Demo account'
-                  : 'Your finance space');
+                  : appConfig.brandTagline);
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: onProfileTap,
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: AppTheme.softShadow,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: photoUrl != null
-                          ? Image.network(
-                              photoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const CircleAvatar(
-                                    backgroundColor: AppTheme.primary,
-                                    child: Icon(
-                                      Icons.person_rounded,
-                                      color: Colors.white,
+            Expanded(
+              child: Row(
+                children: [
+                  AppBrandLogo(
+                    logoUrl: appConfig.logoUrl,
+                    size: 42,
+                    backgroundColor: primaryColor.withValues(alpha: 0.08),
+                  ),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: onProfileTap,
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: AppTheme.softShadow,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: photoUrl != null
+                            ? Image.network(
+                                photoUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    CircleAvatar(
+                                      backgroundColor: primaryColor,
+                                      child: const Icon(
+                                        Icons.person_rounded,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                            )
-                          : const CircleAvatar(
-                              backgroundColor: AppTheme.primary,
-                              child: Icon(
-                                Icons.person_rounded,
-                                color: Colors.white,
+                              )
+                            : CircleAvatar(
+                                backgroundColor: primaryColor,
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back,',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: const Color(0xFF64748B),
-                        fontWeight: FontWeight.w500,
-                      ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          appConfig.brandName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: const Color(0xFF64748B),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 17,
+                            color: const Color(0xFF0F172A),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          role,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      name,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 17,
-                        color: const Color(0xFF0F172A),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      role,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: const Color(0xFF64748B),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: onRefresh,
               child: Container(
@@ -549,11 +609,19 @@ class _TopBar extends StatelessWidget {
 
 class _BalanceCard extends StatelessWidget {
   const _BalanceCard({
+    required this.title,
+    required this.message,
+    required this.primaryColor,
+    required this.secondaryColor,
     required this.balance,
     required this.income,
     required this.expense,
   });
 
+  final String title;
+  final String message;
+  final Color primaryColor;
+  final Color secondaryColor;
   final double balance;
   final double income;
   final double expense;
@@ -564,20 +632,32 @@ class _BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        gradient: AppTheme.primaryGradient,
+        gradient: LinearGradient(
+          colors: [primaryColor, secondaryColor],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: AppTheme.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Financial Overview',
+            title,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.78),
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
+          Text(
+            message,
+            style: GoogleFonts.inter(
+              color: Colors.white.withValues(alpha: 0.72),
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             CurrencyUtils.format(balance),
             style: GoogleFonts.plusJakartaSans(
@@ -690,6 +770,10 @@ class _FeatureGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final item = items[index];
+        final iconColor = item.enabled ? item.color : const Color(0xFF94A3B8);
+        final background = item.enabled
+            ? item.background
+            : const Color(0xFFF1F5F9);
         return InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: item.onTap,
@@ -708,18 +792,45 @@ class _FeatureGrid extends StatelessWidget {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: item.background,
+                    color: background,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(item.icon, color: item.color),
+                  child: Icon(item.icon, color: iconColor),
                 ),
                 const Spacer(),
-                Text(
-                  item.label,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w700,
+                          color: item.enabled
+                              ? AppTheme.textPrimary
+                              : AppTheme.textHint,
+                        ),
+                      ),
+                    ),
+                    if (!item.enabled)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'Paused',
+                          style: GoogleFonts.inter(
+                            color: AppTheme.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -737,6 +848,7 @@ class _FeatureItem {
     required this.color,
     required this.background,
     required this.onTap,
+    this.enabled = true,
   });
 
   final String label;
@@ -744,6 +856,7 @@ class _FeatureItem {
   final Color color;
   final Color background;
   final VoidCallback onTap;
+  final bool enabled;
 }
 
 class _ProgressPanel extends StatelessWidget {

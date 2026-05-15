@@ -12,7 +12,8 @@ class SecurityOverlay extends StatefulWidget {
   State<SecurityOverlay> createState() => _SecurityOverlayState();
 }
 
-class _SecurityOverlayState extends State<SecurityOverlay> with WidgetsBindingObserver {
+class _SecurityOverlayState extends State<SecurityOverlay>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -27,7 +28,8 @@ class _SecurityOverlayState extends State<SecurityOverlay> with WidgetsBindingOb
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       // Lock the app when it goes to background
       context.read<SecurityService>().lockApp();
     }
@@ -45,7 +47,7 @@ class _SecurityOverlayState extends State<SecurityOverlay> with WidgetsBindingOb
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                   child: Container(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,11 +55,15 @@ class _SecurityOverlayState extends State<SecurityOverlay> with WidgetsBindingOb
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white24),
                             ),
-                            child: const Icon(Icons.lock_rounded, color: Colors.white, size: 64),
+                            child: const Icon(
+                              Icons.lock_rounded,
+                              color: Colors.white,
+                              size: 64,
+                            ),
                           ),
                           const SizedBox(height: 32),
                           Text(
@@ -84,8 +90,13 @@ class _SecurityOverlayState extends State<SecurityOverlay> with WidgetsBindingOb
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF2E3192),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                           ),
                         ],

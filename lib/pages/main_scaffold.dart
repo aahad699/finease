@@ -2,6 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../models/app_config.dart';
+import '../services/app_config_service.dart';
+import '../widgets/app_config_gate.dart';
+import '../theme/app_theme.dart';
 import 'budget/ai_budget_advisor_page.dart';
 import 'chatbot/chatbot_page.dart';
 import 'home/home_page.dart';
@@ -18,26 +22,63 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    AIBudgetAdvisorPage(),
-    LoanSimulatorPage(embedded: true),
-    ChatbotPage(embedded: true),
-    ProfilePage(),
-  ];
-
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: _buildPremiumNavBar(),
+    return StreamBuilder<AppConfig>(
+      stream: AppConfigService().watchConfig(),
+      initialData: AppConfig.defaults(),
+      builder: (context, snapshot) {
+        final config = snapshot.data ?? AppConfig.defaults();
+        final primaryColor = appConfigColor(
+          config.primaryColorHex,
+          AppTheme.primary,
+        );
+        if (config.maintenanceMode) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFF8F9FF),
+            body: AppBlockedView(
+              title: '${config.brandName} is under maintenance',
+              message: config.supportMessage,
+              icon: Icons.construction_rounded,
+              color: primaryColor,
+            ),
+          );
+        }
+
+        final pages = [
+          HomePage(appConfig: config),
+          const AIBudgetAdvisorPage(),
+          const LoanSimulatorPage(embedded: true),
+          config.chatbotEnabled
+              ? const ChatbotPage(embedded: true)
+              : AppBlockedView(
+                  title: 'AI chatbot is paused',
+                  message: config.supportMessage,
+                  icon: Icons.smart_toy_outlined,
+                  color: primaryColor,
+                ),
+          const ProfilePage(),
+        ];
+
+        return Scaffold(
+          extendBody: true,
+          body: Column(
+            children: [
+              AppAnnouncementBanner(config: config),
+              Expanded(
+                child: IndexedStack(index: _selectedIndex, children: pages),
+              ),
+            ],
+          ),
+          bottomNavigationBar: _buildPremiumNavBar(config, primaryColor),
+        );
+      },
     );
   }
 
-  Widget _buildPremiumNavBar() {
+  Widget _buildPremiumNavBar(AppConfig config, Color primaryColor) {
     return Container(
       height: 85,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
@@ -64,15 +105,37 @@ class _MainScaffoldState extends State<MainScaffold> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(0, Icons.home_rounded, 'Home'),
+                _buildNavItem(
+                  0,
+                  Icons.home_rounded,
+                  'Home',
+                  activeColor: primaryColor,
+                ),
                 _buildNavItem(
                   1,
                   Icons.account_balance_wallet_rounded,
                   'Budget',
+                  activeColor: primaryColor,
                 ),
-                _buildNavItem(2, Icons.calculate_rounded, 'Loans'),
-                _buildNavItem(3, Icons.smart_toy_rounded, 'Chatbot'),
-                _buildNavItem(4, Icons.person_rounded, 'Profile'),
+                _buildNavItem(
+                  2,
+                  Icons.calculate_rounded,
+                  'Loans',
+                  activeColor: primaryColor,
+                ),
+                _buildNavItem(
+                  3,
+                  Icons.smart_toy_rounded,
+                  'Chatbot',
+                  enabled: config.chatbotEnabled,
+                  activeColor: primaryColor,
+                ),
+                _buildNavItem(
+                  4,
+                  Icons.person_rounded,
+                  'Profile',
+                  activeColor: primaryColor,
+                ),
               ],
             ),
           ),
@@ -81,11 +144,19 @@ class _MainScaffoldState extends State<MainScaffold> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(
+    int index,
+    IconData icon,
+    String label, {
+    bool enabled = true,
+    Color activeColor = const Color(0xFF2E3192),
+  }) {
     final isSelected = _selectedIndex == index;
     final color = isSelected
-        ? const Color(0xFF2E3192)
-        : const Color(0xFF94A3B8);
+        ? activeColor
+        : enabled
+        ? const Color(0xFF94A3B8)
+        : const Color(0xFFCBD5E1);
 
     return GestureDetector(
       onTap: () => _onItemTapped(index),

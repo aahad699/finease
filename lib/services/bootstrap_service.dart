@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import '../app_constants.dart';
 import '../data/demo_finance_data.dart';
+import '../models/app_config.dart';
 
 class BootstrapService {
   static Future<void> ensureSpecialAccounts() async {
@@ -60,6 +61,7 @@ class BootstrapService {
 
       await _seedMarketplace(db);
       await _seedSystemMetrics(db);
+      await _seedAppConfig(db);
     } finally {
       await auth.signOut();
       await bootstrapApp.delete();
@@ -152,6 +154,13 @@ class BootstrapService {
       'latencyMs': 12,
       'pendingWelfare': 42,
       'urgentReviews': 12,
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> _seedAppConfig(FirebaseFirestore db) async {
+    await db.collection('app_config').doc('global').set({
+      ...AppConfig.defaults().toMap(),
+      'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }
 }

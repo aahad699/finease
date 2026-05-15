@@ -80,9 +80,13 @@ class _SignupPageState extends State<SignupPage>
   void initState() {
     super.initState();
     _shakeCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
-    _shakeAnim = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(parent: _shakeCtrl, curve: Curves.elasticIn));
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _shakeAnim = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.elasticIn));
     _passCtrl.addListener(() {
       setState(() => _password = _passCtrl.text);
     });
@@ -115,7 +119,8 @@ class _SignupPageState extends State<SignupPage>
   String? _validateEmail(String? v) {
     if (v == null || v.trim().isEmpty) return 'Email address is required';
     final emailRegex = RegExp(
-        r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+      r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
+    );
     if (!emailRegex.hasMatch(v.trim())) return 'Enter a valid email address';
     return null;
   }
@@ -159,8 +164,10 @@ class _SignupPageState extends State<SignupPage>
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.signUpWithEmail(
-          _emailCtrl.text.trim(), _passCtrl.text,
-          fullName: _nameCtrl.text.trim());
+        _emailCtrl.text.trim(),
+        _passCtrl.text,
+        fullName: _nameCtrl.text.trim(),
+      );
       if (mounted) Navigator.pop(context);
     } on Exception catch (e) {
       if (mounted) {
@@ -187,17 +194,25 @@ class _SignupPageState extends State<SignupPage>
   }
 
   void _showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Row(children: [
-        const Icon(Icons.error_outline_rounded, color: Colors.white, size: 18),
-        const SizedBox(width: 10),
-        Expanded(child: Text(msg, style: GoogleFonts.inter(fontSize: 13))),
-      ]),
-      backgroundColor: _error,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.all(16),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(child: Text(msg, style: GoogleFonts.inter(fontSize: 13))),
+          ],
+        ),
+        backgroundColor: _error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   @override
@@ -210,26 +225,34 @@ class _SignupPageState extends State<SignupPage>
           Positioned(
             top: -120,
             left: -80,
-            child: _bgCircle(280, _primary.withOpacity(0.05)),
+            child: _bgCircle(280, _primary.withValues(alpha: 0.05)),
           ),
           Positioned(
             bottom: -60,
             right: -60,
-            child: _bgCircle(220, const Color(0xFF1BFFFF).withOpacity(0.07)),
+            child: _bgCircle(
+              220,
+              const Color(0xFF1BFFFF).withValues(alpha: 0.07),
+            ),
           ),
           SafeArea(
             child: Column(
               children: [
                 // Back button
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back_ios_new_rounded,
-                            color: _dark, size: 20),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: _dark,
+                          size: 20,
+                        ),
                       ),
                     ],
                   ),
@@ -243,12 +266,13 @@ class _SignupPageState extends State<SignupPage>
                         animation: _shakeAnim,
                         builder: (context, child) => Transform.translate(
                           offset: Offset(
-                              _shakeCtrl.isAnimating
-                                  ? 8 *
+                            _shakeCtrl.isAnimating
+                                ? 8 *
                                       (0.5 - _shakeAnim.value).abs() *
                                       (_shakeAnim.value > 0.5 ? 1 : -1)
-                                  : 0,
-                              0),
+                                : 0,
+                            0,
+                          ),
                           child: child,
                         ),
                         child: Column(
@@ -259,31 +283,42 @@ class _SignupPageState extends State<SignupPage>
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                    colors: [Color(0xFF1BFFFF), _primary]),
+                                  colors: [Color(0xFF1BFFFF), _primary],
+                                ),
                                 borderRadius: BorderRadius.circular(18),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: _primary.withOpacity(0.3),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 8))
+                                    color: _primary.withValues(alpha: 0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
                                 ],
                               ),
-                              child: const Icon(Icons.person_add_rounded,
-                                  color: Colors.white, size: 32),
+                              child: const Icon(
+                                Icons.person_add_rounded,
+                                color: Colors.white,
+                                size: 32,
+                              ),
                             ),
                             const SizedBox(height: 28),
-                            Text('Create Account',
-                                style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w800,
-                                    color: _dark,
-                                    letterSpacing: -1)),
+                            Text(
+                              'Create Account',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w800,
+                                color: _dark,
+                                letterSpacing: -1,
+                              ),
+                            ),
                             const SizedBox(height: 6),
-                            Text('Secure your financial future with FinEase.',
-                                style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                    height: 1.5)),
+                            Text(
+                              'Secure your financial future with FinEase.',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                height: 1.5,
+                              ),
+                            ),
                             const SizedBox(height: 32),
 
                             // ── Full Name ──
@@ -296,8 +331,9 @@ class _SignupPageState extends State<SignupPage>
                               icon: Icons.person_outline_rounded,
                               validator: _validateName,
                               textCapitalization: TextCapitalization.words,
-                              onSubmit: () => FocusScope.of(context)
-                                  .requestFocus(_emailFocus),
+                              onSubmit: () => FocusScope.of(
+                                context,
+                              ).requestFocus(_emailFocus),
                             ),
                             const SizedBox(height: 20),
 
@@ -310,13 +346,12 @@ class _SignupPageState extends State<SignupPage>
                               hint: 'name@example.com',
                               icon: Icons.alternate_email_rounded,
                               keyboardType: TextInputType.emailAddress,
-                              validator: _emailTouched
-                                  ? _validateEmail
-                                  : null,
+                              validator: _emailTouched ? _validateEmail : null,
                               onChanged: (_) =>
                                   setState(() => _emailTouched = true),
-                              onSubmit: () => FocusScope.of(context)
-                                  .requestFocus(_passFocus),
+                              onSubmit: () => FocusScope.of(
+                                context,
+                              ).requestFocus(_passFocus),
                             ),
                             const SizedBox(height: 20),
 
@@ -332,12 +367,14 @@ class _SignupPageState extends State<SignupPage>
                               showPass: _showPass,
                               onToggle: () =>
                                   setState(() => _showPass = !_showPass),
-                              validator:
-                                  _passTouched ? _validatePassword : null,
+                              validator: _passTouched
+                                  ? _validatePassword
+                                  : null,
                               onChanged: (_) =>
                                   setState(() => _passTouched = true),
-                              onSubmit: () => FocusScope.of(context)
-                                  .requestFocus(_confirmFocus),
+                              onSubmit: () => FocusScope.of(
+                                context,
+                              ).requestFocus(_confirmFocus),
                             ),
 
                             // ── Strength Meter ──
@@ -369,7 +406,8 @@ class _SignupPageState extends State<SignupPage>
                                   : null,
                               onChanged: (_) =>
                                   setState(() => _confirmTouched = true),
-                              suffixCheckmark: _confirmPassCtrl.text.isNotEmpty &&
+                              suffixCheckmark:
+                                  _confirmPassCtrl.text.isNotEmpty &&
                                   _confirmPassCtrl.text == _passCtrl.text,
                             ),
                             const SizedBox(height: 24),
@@ -387,17 +425,23 @@ class _SignupPageState extends State<SignupPage>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text('Already have an account? ',
-                                      style: GoogleFonts.inter(
-                                          color: Colors.grey[600],
-                                          fontSize: 13)),
+                                  Text(
+                                    'Already have an account? ',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.grey[600],
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                   GestureDetector(
                                     onTap: () => Navigator.pop(context),
-                                    child: Text('Login',
-                                        style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.bold,
-                                            color: _primary,
-                                            fontSize: 13)),
+                                    child: Text(
+                                      'Login',
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.bold,
+                                        color: _primary,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -421,17 +465,19 @@ class _SignupPageState extends State<SignupPage>
   // ── UI Helpers ───────────────────────────────────────────────────────────────
 
   Widget _bgCircle(double size, Color color) => Container(
-        width: size,
-        height: size,
-        decoration:
-            BoxDecoration(shape: BoxShape.circle, color: color),
-      );
+    width: size,
+    height: size,
+    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+  );
 
-  Widget _fieldLabel(String text) => Text(text,
-      style: GoogleFonts.plusJakartaSans(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: _dark));
+  Widget _fieldLabel(String text) => Text(
+    text,
+    style: GoogleFonts.plusJakartaSans(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: _dark,
+    ),
+  );
 
   Widget _buildField({
     required TextEditingController controller,
@@ -459,8 +505,9 @@ class _SignupPageState extends State<SignupPage>
       validator: validator,
       onChanged: onChanged,
       onFieldSubmitted: (_) => onSubmit?.call(),
-      textInputAction:
-          onSubmit != null ? TextInputAction.next : TextInputAction.done,
+      textInputAction: onSubmit != null
+          ? TextInputAction.next
+          : TextInputAction.done,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.inter(color: Colors.grey[400], fontSize: 14),
@@ -468,15 +515,15 @@ class _SignupPageState extends State<SignupPage>
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
-                    showPass ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey[400],
-                    size: 20),
+                  showPass ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey[400],
+                  size: 20,
+                ),
                 onPressed: onToggle,
               )
             : suffixCheckmark
-                ? const Icon(Icons.check_circle_rounded,
-                    color: _success, size: 20)
-                : null,
+            ? const Icon(Icons.check_circle_rounded, color: _success, size: 20)
+            : null,
         filled: true,
         fillColor: const Color(0xFFF8F9FE),
         border: OutlineInputBorder(
@@ -499,8 +546,10 @@ class _SignupPageState extends State<SignupPage>
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: _error, width: 1.5),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 16,
+        ),
         errorStyle: GoogleFonts.inter(fontSize: 11, color: _error),
       ),
     );
@@ -530,18 +579,20 @@ class _SignupPageState extends State<SignupPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Password Strength',
-                style: GoogleFonts.inter(
-                    fontSize: 11, color: Colors.grey[500])),
+            Text(
+              'Password Strength',
+              style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500]),
+            ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: Text(
                 _strengthLabel,
                 key: ValueKey(_strengthLabel),
                 style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: _strengthColor),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: _strengthColor,
+                ),
               ),
             ),
           ],
@@ -568,11 +619,14 @@ class _SignupPageState extends State<SignupPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Password Requirements',
-              style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.grey[700])),
+          Text(
+            'Password Requirements',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey[700],
+            ),
+          ),
           const SizedBox(height: 10),
           ...rules.map((r) => _requirementRow(r.$1, r.$2)),
         ],
@@ -600,12 +654,14 @@ class _SignupPageState extends State<SignupPage>
             ),
           ),
           const SizedBox(width: 10),
-          Text(text,
-              style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: met ? _dark : Colors.grey[500],
-                  fontWeight:
-                      met ? FontWeight.w600 : FontWeight.w400)),
+          Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: met ? _dark : Colors.grey[500],
+              fontWeight: met ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
         ],
       ),
     );
@@ -624,13 +680,13 @@ class _SignupPageState extends State<SignupPage>
             decoration: BoxDecoration(
               color: _acceptedTerms ? _primary : Colors.white,
               border: Border.all(
-                  color: _acceptedTerms ? _primary : Colors.grey[300]!,
-                  width: 1.5),
+                color: _acceptedTerms ? _primary : Colors.grey[300]!,
+                width: 1.5,
+              ),
               borderRadius: BorderRadius.circular(6),
             ),
             child: _acceptedTerms
-                ? const Icon(Icons.check_rounded,
-                    color: Colors.white, size: 14)
+                ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -638,18 +694,27 @@ class _SignupPageState extends State<SignupPage>
             child: Text.rich(
               TextSpan(
                 style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.grey[600], height: 1.5),
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
                 children: [
                   const TextSpan(text: 'I agree to the '),
                   TextSpan(
-                      text: 'Terms of Service',
-                      style: const TextStyle(
-                          color: _primary, fontWeight: FontWeight.w700)),
+                    text: 'Terms of Service',
+                    style: const TextStyle(
+                      color: _primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   const TextSpan(text: ' and '),
                   TextSpan(
-                      text: 'Privacy Policy',
-                      style: const TextStyle(
-                          color: _primary, fontWeight: FontWeight.w700)),
+                    text: 'Privacy Policy',
+                    style: const TextStyle(
+                      color: _primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -666,16 +731,18 @@ class _SignupPageState extends State<SignupPage>
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              colors: _acceptedTerms
-                  ? [_primary, const Color(0xFF1565C0)]
-                  : [Colors.grey[300]!, Colors.grey[400]!]),
+            colors: _acceptedTerms
+                ? [_primary, const Color(0xFF1565C0)]
+                : [Colors.grey[300]!, Colors.grey[400]!],
+          ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: _acceptedTerms
               ? [
                   BoxShadow(
-                      color: _primary.withOpacity(0.35),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8))
+                    color: _primary.withValues(alpha: 0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
                 ]
               : [],
         ),
@@ -686,19 +753,26 @@ class _SignupPageState extends State<SignupPage>
             shadowColor: Colors.transparent,
             padding: const EdgeInsets.symmetric(vertical: 18),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
           child: _isLoading
               ? const SizedBox(
                   height: 22,
                   width: 22,
                   child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2.5))
-              : Text('Create Secure Account',
+                    color: Colors.white,
+                    strokeWidth: 2.5,
+                  ),
+                )
+              : Text(
+                  'Create Secure Account',
                   style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: _acceptedTerms ? Colors.white : Colors.grey[500])),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: _acceptedTerms ? Colors.white : Colors.grey[500],
+                  ),
+                ),
         ),
       ),
     );
@@ -723,8 +797,10 @@ class _SignupPageState extends State<SignupPage>
       children: [
         Icon(icon, size: 13, color: Colors.grey[400]),
         const SizedBox(width: 5),
-        Text(label,
-            style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[400])),
+        Text(
+          label,
+          style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[400]),
+        ),
       ],
     );
   }

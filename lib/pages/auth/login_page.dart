@@ -336,12 +336,15 @@ class _LoginPageState extends State<LoginPage>
           Positioned(
             top: -100,
             right: -100,
-            child: _bgCircle(300, _primary.withOpacity(0.05)),
+            child: _bgCircle(300, _primary.withValues(alpha: 0.05)),
           ),
           Positioned(
             bottom: -50,
             left: -50,
-            child: _bgCircle(200, const Color(0xFF1BFFFF).withOpacity(0.08)),
+            child: _bgCircle(
+              200,
+              const Color(0xFF1BFFFF).withValues(alpha: 0.08),
+            ),
           ),
           SafeArea(
             child: SingleChildScrollView(
@@ -376,7 +379,7 @@ class _LoginPageState extends State<LoginPage>
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: _primary.withOpacity(0.35),
+                              color: _primary.withValues(alpha: 0.35),
                               blurRadius: 24,
                               offset: const Offset(0, 10),
                             ),
@@ -660,9 +663,9 @@ class _LoginPageState extends State<LoginPage>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: _error.withOpacity(0.08),
+        color: _error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _error.withOpacity(0.3)),
+        border: Border.all(color: _error.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -721,7 +724,7 @@ class _LoginPageState extends State<LoginPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: _primary.withOpacity(0.35),
+            color: _primary.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -777,7 +780,7 @@ class _LoginPageState extends State<LoginPage>
         border: Border.all(color: const Color(0xFFEEEEEE)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

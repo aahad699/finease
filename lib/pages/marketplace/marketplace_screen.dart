@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_config_gate.dart';
 
 class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
@@ -20,111 +21,119 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   Widget build(BuildContext context) {
     final firestoreService = context.watch<AuthService>().firestoreService;
 
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 150,
-            pinned: true,
-            automaticallyImplyLeading: true,
-            backgroundColor: AppTheme.primary,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: AppTheme.cardGradient,
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Partner Marketplace',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
+    return AppFeatureGate(
+      enabled: (config) => config.marketplaceEnabled,
+      blockedTitle: 'Marketplace is paused',
+      blockedMessage:
+          'Partner marketplace access is temporarily paused by FinEase admin.',
+      blockedIcon: Icons.storefront_outlined,
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 150,
+              pinned: true,
+              automaticallyImplyLeading: true,
+              backgroundColor: AppTheme.primary,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: const BoxDecoration(
+                    gradient: AppTheme.cardGradient,
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Partner Marketplace',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Browse trusted services, financing options, and growth partners sourced for Pakistani users.',
-                          style: GoogleFonts.inter(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            height: 1.5,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Browse trusted services, financing options, and growth partners sourced for Pakistani users.',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              height: 1.5,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: firestoreService == null
-                ? const SizedBox.shrink()
-                : StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: firestoreService.getMarketplacePartners(),
-                    builder: (context, snapshot) {
-                      final partners = snapshot.data ?? const [];
-                      final categories = {
-                        'All',
-                        ...partners.map(
-                          (partner) =>
-                              partner['category'] as String? ?? 'General',
-                        ),
-                      }.toList();
-                      final filtered = _category == 'All'
-                          ? partners
-                          : partners
-                                .where(
-                                  (partner) => partner['category'] == _category,
-                                )
-                                .toList();
+            SliverToBoxAdapter(
+              child: firestoreService == null
+                  ? const SizedBox.shrink()
+                  : StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: firestoreService.getMarketplacePartners(),
+                      builder: (context, snapshot) {
+                        final partners = snapshot.data ?? const [];
+                        final categories = {
+                          'All',
+                          ...partners.map(
+                            (partner) =>
+                                partner['category'] as String? ?? 'General',
+                          ),
+                        }.toList();
+                        final filtered = _category == 'All'
+                            ? partners
+                            : partners
+                                  .where(
+                                    (partner) =>
+                                        partner['category'] == _category,
+                                  )
+                                  .toList();
 
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 46,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: categories.length,
-                                separatorBuilder: (_, index) =>
-                                    const SizedBox(width: 8),
-                                itemBuilder: (context, index) {
-                                  final value = categories[index];
-                                  final selected = value == _category;
-                                  return ChoiceChip(
-                                    label: Text(value),
-                                    selected: selected,
-                                    onSelected: (_) =>
-                                        setState(() => _category = value),
-                                  );
-                                },
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 46,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: categories.length,
+                                  separatorBuilder: (_, index) =>
+                                      const SizedBox(width: 8),
+                                  itemBuilder: (context, index) {
+                                    final value = categories[index];
+                                    final selected = value == _category;
+                                    return ChoiceChip(
+                                      label: Text(value),
+                                      selected: selected,
+                                      onSelected: (_) =>
+                                          setState(() => _category = value),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 18),
-                            _TrustBanner(count: filtered.length),
-                            const SizedBox(height: 16),
-                            if (filtered.isEmpty)
-                              const _EmptyMarketplace()
-                            else
-                              ...filtered.map(
-                                (partner) => _PartnerCard(partner: partner),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                              const SizedBox(height: 18),
+                              _TrustBanner(count: filtered.length),
+                              const SizedBox(height: 16),
+                              if (filtered.isEmpty)
+                                const _EmptyMarketplace()
+                              else
+                                ...filtered.map(
+                                  (partner) => _PartnerCard(partner: partner),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

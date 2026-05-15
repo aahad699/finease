@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'models/app_config.dart';
+import 'services/app_config_service.dart';
 import 'services/auth_service.dart';
 import 'services/bootstrap_service.dart';
 import 'pages/auth/email_verification_page.dart';
@@ -29,11 +31,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FinEase',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const AuthWrapper(),
+    return StreamBuilder<AppConfig>(
+      stream: AppConfigService().watchConfig(),
+      initialData: AppConfig.defaults(),
+      builder: (context, snapshot) {
+        final config = snapshot.data ?? AppConfig.defaults();
+        return MaterialApp(
+          title: config.brandName,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          home: const AuthWrapper(),
+        );
+      },
     );
   }
 }

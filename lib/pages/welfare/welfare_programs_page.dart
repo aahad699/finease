@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
+import '../../widgets/app_config_gate.dart';
 
 class WelfareProgramsPage extends StatefulWidget {
   const WelfareProgramsPage({super.key});
@@ -112,113 +113,120 @@ class _WelfareProgramsPageState extends State<WelfareProgramsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
+    return AppFeatureGate(
+      enabled: (config) => config.welfareEnabled,
+      blockedTitle: 'Welfare programs are paused',
+      blockedMessage:
+          'The welfare directory is temporarily paused by FinEase admin.',
+      blockedIcon: Icons.volunteer_activism_outlined,
+      child: Scaffold(
         backgroundColor: AppTheme.background,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: Colors.black,
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: AppTheme.background,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            color: Colors.black,
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Welfare Programs',
+            style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
+          ),
         ),
-        title: Text(
-          'Welfare Programs',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Verified support programs',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.primary,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Discover real welfare, scholarship, health, and support programs in Pakistan and open their official application websites directly.',
-              style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 22),
-            TextField(
-              onChanged: (value) => setState(() => _searchQuery = value),
-              decoration: const InputDecoration(
-                hintText: 'Search programs or organizations',
-                prefixIcon: Icon(Icons.search_rounded),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildChip('All Programs'),
-                  _buildChip('Cash Support'),
-                  _buildChip('Education'),
-                  _buildChip('Healthcare'),
-                  _buildChip('Loans'),
-                  _buildChip('Relief'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            ..._filteredPrograms.map(
-              (program) => Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: _ProgramCard(
-                  program: program,
-                  onApply: () => _launchProgram(program['link'] as String),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Verified support programs',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primary,
                 ),
               ),
-            ),
-            const SizedBox(height: 18),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                gradient: AppTheme.cardGradient,
-                borderRadius: BorderRadius.circular(22),
+              const SizedBox(height: 10),
+              Text(
+                'Discover real welfare, scholarship, health, and support programs in Pakistan and open their official application websites directly.',
+                style: GoogleFonts.inter(
+                  color: AppTheme.textSecondary,
+                  height: 1.5,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Impact snapshot',
-                    style: GoogleFonts.inter(
-                      color: Colors.white.withValues(alpha: 0.75),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Use FinEase to compare real support pathways before you apply.',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      _ImpactStat(value: '6', label: 'VERIFIED PROGRAMS'),
-                      _ImpactStat(value: '4', label: 'SUPPORT TYPES'),
-                      _ImpactStat(value: '100%', label: 'OFFICIAL LINKS'),
-                    ],
-                  ),
-                ],
+              const SizedBox(height: 22),
+              TextField(
+                onChanged: (value) => setState(() => _searchQuery = value),
+                decoration: const InputDecoration(
+                  hintText: 'Search programs or organizations',
+                  prefixIcon: Icon(Icons.search_rounded),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildChip('All Programs'),
+                    _buildChip('Cash Support'),
+                    _buildChip('Education'),
+                    _buildChip('Healthcare'),
+                    _buildChip('Loans'),
+                    _buildChip('Relief'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ..._filteredPrograms.map(
+                (program) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _ProgramCard(
+                    program: program,
+                    onApply: () => _launchProgram(program['link'] as String),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.cardGradient,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Impact snapshot',
+                      style: GoogleFonts.inter(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Use FinEase to compare real support pathways before you apply.',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        _ImpactStat(value: '6', label: 'VERIFIED PROGRAMS'),
+                        _ImpactStat(value: '4', label: 'SUPPORT TYPES'),
+                        _ImpactStat(value: '100%', label: 'OFFICIAL LINKS'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

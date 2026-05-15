@@ -7,6 +7,8 @@ import '../../models/budget_plan.dart';
 import '../../models/saving_goal.dart';
 import '../../models/transaction.dart';
 import '../../app_constants.dart';
+import '../../models/app_config.dart';
+import '../../services/app_config_service.dart';
 import '../../services/ai_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
@@ -174,39 +176,74 @@ class _AIBudgetAdvisorPageState extends State<AIBudgetAdvisorPage> {
                               const SizedBox(height: 24),
                               const _SectionTitle(title: 'AI Recommendations'),
                               const SizedBox(height: 14),
-                              FutureBuilder<String>(
-                                future: _aiService.getBudgetPlanRecommendations(
-                                  budgets,
-                                  monthlyTransactions,
-                                ),
-                                builder: (context, snapshot) {
-                                  final body = snapshot.hasError
-                                      ? 'AI is not running yet: ${snapshot.error}'
-                                      : snapshot.data ??
-                                            'Generating budget plan recommendations...';
-                                  return _InsightCard(
-                                    title: 'Budget Plan Coach',
-                                    body: body,
-                                    icon: Icons.auto_awesome_rounded,
-                                    color: const Color(0xFF22D3EE),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              FutureBuilder<String>(
-                                future: _aiService.getBudgetAdvice(
-                                  monthlyTransactions,
-                                ),
-                                builder: (context, snapshot) {
-                                  final body = snapshot.hasError
-                                      ? 'AI is not running yet: ${snapshot.error}'
-                                      : snapshot.data ??
-                                            'Analyzing your transaction patterns...';
-                                  return _InsightCard(
-                                    title: 'Spending Pattern Insights',
-                                    body: body,
-                                    icon: Icons.insights_rounded,
-                                    color: const Color(0xFF818CF8),
+                              StreamBuilder<AppConfig>(
+                                stream: AppConfigService().watchConfig(),
+                                initialData: AppConfig.defaults(),
+                                builder: (context, configSnapshot) {
+                                  final config =
+                                      configSnapshot.data ??
+                                      AppConfig.defaults();
+                                  if (!config.budgetAiEnabled) {
+                                    return Column(
+                                      children: [
+                                        _InsightCard(
+                                          title: 'Budget Plan Coach',
+                                          body:
+                                              'AI budget recommendations are paused by FinEase admin. You can still create and edit budgets manually.',
+                                          icon: Icons.pause_circle_rounded,
+                                          color: const Color(0xFF22D3EE),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _InsightCard(
+                                          title: 'Spending Pattern Insights',
+                                          body: config.supportMessage,
+                                          icon: Icons.insights_rounded,
+                                          color: const Color(0xFF818CF8),
+                                        ),
+                                      ],
+                                    );
+                                  }
+
+                                  return Column(
+                                    children: [
+                                      FutureBuilder<String>(
+                                        future: _aiService
+                                            .getBudgetPlanRecommendations(
+                                              budgets,
+                                              monthlyTransactions,
+                                            ),
+                                        builder: (context, snapshot) {
+                                          final body = snapshot.hasError
+                                              ? 'AI is not running yet: ${snapshot.error}'
+                                              : snapshot.data ??
+                                                    'Generating budget plan recommendations...';
+                                          return _InsightCard(
+                                            title: 'Budget Plan Coach',
+                                            body: body,
+                                            icon: Icons.auto_awesome_rounded,
+                                            color: const Color(0xFF22D3EE),
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      FutureBuilder<String>(
+                                        future: _aiService.getBudgetAdvice(
+                                          monthlyTransactions,
+                                        ),
+                                        builder: (context, snapshot) {
+                                          final body = snapshot.hasError
+                                              ? 'AI is not running yet: ${snapshot.error}'
+                                              : snapshot.data ??
+                                                    'Analyzing your transaction patterns...';
+                                          return _InsightCard(
+                                            title: 'Spending Pattern Insights',
+                                            body: body,
+                                            icon: Icons.insights_rounded,
+                                            color: const Color(0xFF818CF8),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   );
                                 },
                               ),

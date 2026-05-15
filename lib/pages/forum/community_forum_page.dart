@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/app_config.dart';
+import '../../services/app_config_service.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_config_gate.dart';
 
 class CommunityForumPage extends StatefulWidget {
   const CommunityForumPage({super.key});
@@ -43,70 +46,97 @@ class _CommunityForumPageState extends State<CommunityForumPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: AppTheme.background,
-            elevation: 0,
-            title: Text(
-              'Community Forum',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
-                fontSize: 22,
-                color: AppTheme.textPrimary,
+    return StreamBuilder<AppConfig>(
+      stream: AppConfigService().watchConfig(),
+      initialData: AppConfig.defaults(),
+      builder: (context, snapshot) {
+        final config = snapshot.data ?? AppConfig.defaults();
+        if (config.maintenanceMode || !config.forumEnabled) {
+          return AppBlockedScreen(
+            title: config.maintenanceMode
+                ? 'FinEase is under maintenance'
+                : 'Community forum is paused',
+            message: config.supportMessage,
+            icon: config.maintenanceMode
+                ? Icons.construction_rounded
+                : Icons.forum_outlined,
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: AppTheme.background,
+          body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: AppTheme.background,
+                elevation: 0,
+                title: Text(
+                  'Community Forum',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                bottom: TabBar(
+                  controller: _tabController,
+                  labelColor: AppTheme.primary,
+                  unselectedLabelColor: AppTheme.textSecondary,
+                  indicatorColor: AppTheme.primary,
+                  labelStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Discussions'),
+                    Tab(text: 'Categories'),
+                  ],
+                ),
               ),
-            ),
-            bottom: TabBar(
+              SliverToBoxAdapter(
+                child: _CategoryFilter(
+                  categories: _categories,
+                  selected: _selectedCategory,
+                  onSelect: (value) =>
+                      setState(() => _selectedCategory = value),
+                ),
+              ),
+            ],
+            body: TabBarView(
               controller: _tabController,
-              labelColor: AppTheme.primary,
-              unselectedLabelColor: AppTheme.textSecondary,
-              indicatorColor: AppTheme.primary,
-              labelStyle: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-              tabs: const [
-                Tab(text: 'Discussions'),
-                Tab(text: 'Categories'),
+              children: [
+                _PostsList(
+                  category: _selectedCategory,
+                  commentsEnabled: config.forumCommentsEnabled,
+                ),
+                _CategoriesGrid(
+                  onCategoryTap: (category) {
+                    setState(() => _selectedCategory = category);
+                    _tabController.animateTo(0);
+                  },
+                ),
               ],
             ),
           ),
-          SliverToBoxAdapter(
-            child: _CategoryFilter(
-              categories: _categories,
-              selected: _selectedCategory,
-              onSelect: (value) => setState(() => _selectedCategory = value),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: config.forumPostingEnabled
+                ? () => _showCreatePostSheet(context)
+                : () => _showPausedSnack(config.supportMessage),
+            backgroundColor: config.forumPostingEnabled
+                ? AppTheme.primary
+                : AppTheme.textHint,
+            icon: const Icon(Icons.edit_rounded, color: Colors.white),
+            label: Text(
+              config.forumPostingEnabled ? 'Post' : 'Posting paused',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ],
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _PostsList(category: _selectedCategory),
-            _CategoriesGrid(
-              onCategoryTap: (category) {
-                setState(() => _selectedCategory = category);
-                _tabController.animateTo(0);
-              },
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreatePostSheet(context),
-        backgroundColor: AppTheme.primary,
-        icon: const Icon(Icons.edit_rounded, color: Colors.white),
-        label: Text(
-          'Post',
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -117,6 +147,12 @@ class _CommunityForumPageState extends State<CommunityForumPage>
       backgroundColor: Colors.transparent,
       builder: (context) => _CreatePostSheet(db: _db),
     );
+  }
+
+  void _showPausedSnack(String message) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -172,9 +208,10 @@ class _CategoryFilter extends StatelessWidget {
 }
 
 class _PostsList extends StatelessWidget {
-  const _PostsList({required this.category});
+  const _PostsList({required this.category, required this.commentsEnabled});
 
   final String category;
+  final bool commentsEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +260,11 @@ class _PostsList extends StatelessWidget {
           itemCount: docs.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
-            return _PostCard(docId: docs[index].id, data: docs[index].data());
+            return _PostCard(
+              docId: docs[index].id,
+              data: docs[index].data(),
+              commentsEnabled: commentsEnabled,
+            );
           },
         );
       },
@@ -232,10 +273,15 @@ class _PostsList extends StatelessWidget {
 }
 
 class _PostCard extends StatefulWidget {
-  const _PostCard({required this.docId, required this.data});
+  const _PostCard({
+    required this.docId,
+    required this.data,
+    required this.commentsEnabled,
+  });
 
   final String docId;
   final Map<String, dynamic> data;
+  final bool commentsEnabled;
 
   @override
   State<_PostCard> createState() => _PostCardState();
@@ -476,6 +522,7 @@ class _PostCardState extends State<_PostCard> {
       builder: (context) => _CommentsSheet(
         postId: widget.docId,
         postTitle: widget.data['title'] ?? 'Discussion',
+        commentsEnabled: widget.commentsEnabled,
       ),
     );
   }
@@ -499,10 +546,15 @@ class _PostCardState extends State<_PostCard> {
 }
 
 class _CommentsSheet extends StatefulWidget {
-  const _CommentsSheet({required this.postId, required this.postTitle});
+  const _CommentsSheet({
+    required this.postId,
+    required this.postTitle,
+    required this.commentsEnabled,
+  });
 
   final String postId;
   final String postTitle;
+  final bool commentsEnabled;
 
   @override
   State<_CommentsSheet> createState() => _CommentsSheetState();
@@ -611,11 +663,19 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               ),
             ),
             const SizedBox(height: 12),
+            if (!widget.commentsEnabled) ...[
+              _ForumPausedBanner(
+                message:
+                    'Commenting is paused by FinEase admin. Existing comments remain visible.',
+              ),
+              const SizedBox(height: 12),
+            ],
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commentController,
+                    enabled: widget.commentsEnabled,
                     maxLines: 3,
                     minLines: 1,
                     decoration: const InputDecoration(
@@ -625,7 +685,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: user == null || _sending ? null : _submitComment,
+                  onPressed: user == null || _sending || !widget.commentsEnabled
+                      ? null
+                      : _submitComment,
                   child: Text(_sending ? '...' : 'Send'),
                 ),
               ],
@@ -637,6 +699,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   }
 
   Future<void> _submitComment() async {
+    if (!widget.commentsEnabled) {
+      return;
+    }
     final authService = context.read<AuthService>();
     final user = authService.user;
     final content = _commentController.text.trim();
@@ -661,6 +726,44 @@ class _CommentsSheetState extends State<_CommentsSheet> {
       _commentController.clear();
       setState(() => _sending = false);
     }
+  }
+}
+
+class _ForumPausedBanner extends StatelessWidget {
+  const _ForumPausedBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFFDE68A)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.pause_circle_outline_rounded,
+            color: AppTheme.warning,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: GoogleFonts.inter(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

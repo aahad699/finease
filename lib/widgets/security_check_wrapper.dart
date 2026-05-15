@@ -47,14 +47,16 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
       await widget.auth.sendEmailVerification();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verification email sent! Please check your inbox.')),
+          const SnackBar(
+            content: Text('Verification email sent! Please check your inbox.'),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isSending = false);
@@ -80,11 +82,14 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E3192).withOpacity(0.1),
+                  color: const Color(0xFF2E3192).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.mark_email_unread_rounded,
-                    size: 64, color: Color(0xFF2E3192)),
+                child: const Icon(
+                  Icons.mark_email_unread_rounded,
+                  size: 64,
+                  color: Color(0xFF2E3192),
+                ),
               ),
               const SizedBox(height: 32),
               Text(
@@ -113,11 +118,26 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2E3192),
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: _isReloading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('I\'ve Verified', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'I\'ve Verified',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -125,12 +145,18 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
                 onPressed: _isSending ? null : _sendVerification,
                 child: _isSending
                     ? const CircularProgressIndicator()
-                    : const Text('Resend Verification Email', style: TextStyle(color: Color(0xFF2E3192))),
+                    : const Text(
+                        'Resend Verification Email',
+                        style: TextStyle(color: Color(0xFF2E3192)),
+                      ),
               ),
               const SizedBox(height: 40),
               TextButton(
                 onPressed: () => widget.auth.signOut(),
-                child: const Text('Cancel & Sign Out', style: TextStyle(color: Colors.red)),
+                child: const Text(
+                  'Cancel & Sign Out',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             ],
           ),

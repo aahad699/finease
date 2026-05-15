@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/hp/finease/finease/windows/flutter"
+    "cmake.sourceDirectory": "C:/Users/hp/finease/finease/windows/flutter",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

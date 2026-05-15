@@ -46,10 +46,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
       _aiInsight = null;
     });
     try {
-      final prompt =
-          '''Analyze this loan for a user in Pakistan: Amount ${CurrencyUtils.exact(_amount)}, markup ${_rate.toStringAsFixed(1)}% annually, tenure ${_tenure.toInt()} months.
-EMI: ${CurrencyUtils.exact(_emi)}/month, Total interest: ${CurrencyUtils.exact(_totalInterest)}.
-Give 3 concise bullet points in PKR.''';
+      final prompt ='''Analyze this loan for a user in Pakistan: Amount ${CurrencyUtils.exact(_amount)}, markup ${_rate.toStringAsFixed(1)}% annually, tenure ${_tenure.toInt()} months. EMI: ${CurrencyUtils.exact(_emi)}/month, Total interest: ${CurrencyUtils.exact(_totalInterest)}. Give 3 concise bullet points in PKR.''';
       final response = await _aiService.generalFinancialAnswer(prompt);
       setState(() {
         _aiInsight = response;
@@ -179,7 +176,7 @@ Give 3 concise bullet points in PKR.''';
                   _Slider(
                     label: 'Loan Amount',
                     value: _amount,
-                    min: 100000,
+                    min: 0,
                     max: 5000000,
                     display: CurrencyUtils.exact(_amount),
                     onChanged: (value) => setState(() => _amount = value),
@@ -188,7 +185,7 @@ Give 3 concise bullet points in PKR.''';
                   _Slider(
                     label: 'Markup Rate',
                     value: _rate,
-                    min: 1,
+                    min: 0,
                     max: 30,
                     display: '${_rate.toStringAsFixed(1)}%',
                     onChanged: (value) => setState(() => _rate = value),
