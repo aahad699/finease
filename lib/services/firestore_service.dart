@@ -443,6 +443,17 @@ class FirestoreService {
         .map((doc) => doc.data() ?? {});
   }
 
+  Stream<Map<String, Map<String, dynamic>>> getAllCourseProgress() {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('course_progress')
+        .snapshots()
+        .map(
+          (snapshot) => {for (final doc in snapshot.docs) doc.id: doc.data()},
+        );
+  }
+
   Future<void> setLessonCompleted(
     String courseId,
     String lessonId,
@@ -492,6 +503,17 @@ class FirestoreService {
         .doc('${courseId}_$quizId')
         .snapshots()
         .map((doc) => doc.data() ?? {});
+  }
+
+  Stream<Map<String, Map<String, dynamic>>> getAllQuizScores() {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('quiz_scores')
+        .snapshots()
+        .map(
+          (snapshot) => {for (final doc in snapshot.docs) doc.id: doc.data()},
+        );
   }
 
   Future<void> saveQuizScore(

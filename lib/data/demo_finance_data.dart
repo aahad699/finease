@@ -13,13 +13,22 @@ class LessonCourse {
     required this.description,
     required this.coverImageUrl,
     required this.category,
+    required this.difficulty,
     required this.durationMinutes,
+    required this.outcome,
+    required this.pathLabel,
     required this.rating,
     required this.xpReward,
+    required this.skillTags,
     required this.lessons,
     required this.quiz,
     required this.externalUrl,
     required this.videoUrl,
+    this.trackId = 'beginner',
+    this.videoId,
+    this.prerequisites = const [],
+    this.localRelevance = '',
+    this.capstone = '',
   });
 
   final String id;
@@ -28,13 +37,42 @@ class LessonCourse {
   final String description;
   final String coverImageUrl;
   final String category;
+  final String difficulty;
   final int durationMinutes;
+  final String outcome;
+  final String pathLabel;
   final double rating;
   final int xpReward;
+  final List<String> skillTags;
   final List<Lesson> lessons;
   final CourseQuiz quiz;
   final String externalUrl;
   final String videoUrl;
+  final String trackId;
+  final String? videoId;
+  final List<String> prerequisites;
+  final String localRelevance;
+  final String capstone;
+}
+
+class LearningTrack {
+  const LearningTrack({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.level,
+    required this.iconName,
+    required this.color,
+    required this.goal,
+  });
+
+  final String id;
+  final String title;
+  final String subtitle;
+  final String level;
+  final String iconName;
+  final Color color;
+  final String goal;
 }
 
 class CourseQuiz {
@@ -66,6 +104,47 @@ class QuizQuestion {
 }
 
 class DemoFinanceData {
+  static const List<LearningTrack> learningTracks = [
+    LearningTrack(
+      id: 'beginner',
+      title: 'Beginner',
+      subtitle: 'Money basics, habits, and first financial wins',
+      level: 'Start here',
+      iconName: 'school',
+      color: Color(0xFF2E3192),
+      goal: 'Build confidence with budgeting, saving, and debt basics.',
+    ),
+    LearningTrack(
+      id: 'intermediate',
+      title: 'Intermediate',
+      subtitle: 'Planning systems, investing, taxes, and protection',
+      level: 'Level up',
+      iconName: 'trending_up',
+      color: Color(0xFF0EA5A4),
+      goal: 'Turn stable habits into a resilient financial plan.',
+    ),
+    LearningTrack(
+      id: 'advanced',
+      title: 'Advanced',
+      subtitle: 'Portfolio strategy, retirement, wealth, and business finance',
+      level: 'Deep work',
+      iconName: 'stacked_line_chart',
+      color: Color(0xFF7C3AED),
+      goal: 'Optimize long-term wealth decisions with stronger analysis.',
+    ),
+    LearningTrack(
+      id: 'specialist',
+      title: 'Specialist',
+      subtitle:
+          'Pakistan-specific, Islamic finance, entrepreneurship, and FIRE',
+      level: 'Expert focus',
+      iconName: 'shield',
+      color: Color(0xFFD97706),
+      goal:
+          'Apply global best practices in local, Shariah-aware, PKR realities.',
+    ),
+  ];
+
   static const List<Map<String, dynamic>> marketplacePartners = [
     {
       'id': 'jubilee-insurance',
@@ -348,36 +427,83 @@ class DemoFinanceData {
       coverImageUrl:
           'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80',
       category: 'Budgeting',
+      difficulty: 'Starter',
       durationMinutes: 38,
+      outcome:
+          'Leave with a practical monthly budget and a simple review rhythm.',
+      pathLabel: 'Foundation Path',
       rating: 4.8,
       xpReward: 220,
+      skillTags: ['Cash flow', 'Planning', 'Savings'],
       lessons: [
         Lesson(
           id: 'bf-1',
           title: 'Give Every Dollar a Job',
           description: 'Set up core budget buckets',
           content:
-              'Start with after-tax income. Cover essentials first, cap lifestyle categories, and reserve savings before discretionary spending.',
+              'Start with after-tax income, not gross salary. Put essentials first: rent, groceries, utilities, transport, school fees, debt minimums, medicine, and family commitments. Then give savings a job before lifestyle spending starts. A budget is not a punishment; it is a decision map. If your monthly income is PKR 180,000, decide the job for every rupee before the month begins so food delivery, subscriptions, and unplanned shopping do not quietly steal your goals.',
           icon: 'pie_chart',
           points: 40,
+          keyTakeaways: [
+            'Budget from usable income after deductions.',
+            'Essentials, savings, debt, and lifestyle should be separate buckets.',
+            'Unassigned money usually becomes accidental spending.',
+          ],
+          practiceTasks: [
+            'Write your monthly take-home income in PKR.',
+            'Create four buckets: essentials, savings, debt, and lifestyle.',
+            'Assign every rupee to one bucket before the next salary cycle.',
+          ],
+          caseStudies: [
+            'A salaried learner in Islamabad was earning PKR 210,000 but felt broke. After assigning PKR 25,000 to savings on salary day and capping eating out, the month stopped feeling random.',
+          ],
+          localExample:
+              'If take-home pay is PKR 180,000, you might assign PKR 95,000 to essentials, PKR 25,000 to savings, PKR 20,000 to debt, and PKR 40,000 to flexible lifestyle spending.',
         ),
         Lesson(
           id: 'bf-2',
           title: 'The 50/30/20 Rule',
           description: 'Use a ratio as a starting point',
           content:
-              'Treat 50/30/20 as a calibration tool, not a law. High-rent cities may need a temporary 60/20/20 structure until income rises.',
+              'The 50/30/20 rule is a starting framework: up to 50% for needs, up to 30% for wants, and at least 20% for savings or debt payoff. It is not a law. In Karachi, Lahore, Islamabad, or any high-rent situation, needs may temporarily sit at 60%. The skill is not forcing the exact ratio; the skill is noticing the trade-off and building a realistic path back toward savings.',
           icon: 'balance',
           points: 40,
+          keyTakeaways: [
+            'The ratio is a benchmark, not a moral score.',
+            'High essential costs require honest adjustment.',
+            'Savings rate should improve as income rises or debt falls.',
+          ],
+          practiceTasks: [
+            'Calculate your current needs, wants, and savings percentages.',
+            'Choose one category to adjust by 3-5% next month.',
+          ],
+          mythBusters: [
+            'Myth: If you cannot hit 50/30/20, budgeting has failed. Reality: the ratio helps diagnose pressure and choose the next move.',
+          ],
+          localExample:
+              'A PKR 160,000 earner paying PKR 70,000 rent may use 60/20/20 temporarily while working on income growth or lower fixed costs.',
         ),
         Lesson(
           id: 'bf-3',
           title: 'Sinking Funds',
           description: 'Plan for irregular expenses',
           content:
-              'Break annual costs like insurance, gifts, and repairs into monthly transfers so they stop feeling like emergencies.',
+              'Sinking funds are mini savings buckets for predictable but irregular costs. Annual insurance, Eid spending, school fees, car maintenance, phone replacement, wedding gifts, and home repairs are not emergencies if you can see them coming. Divide the expected cost by the number of months left, then transfer that amount monthly. This turns panic payments into planned payments.',
           icon: 'wallet',
           points: 60,
+          keyTakeaways: [
+            'Predictable expenses should not drain emergency savings.',
+            'Monthly transfers make large future bills feel smaller.',
+            'Separate sinking funds by purpose so money stays clear.',
+          ],
+          practiceTasks: [
+            'List three annual or seasonal costs coming in the next 12 months.',
+            'Divide each cost by the number of months remaining.',
+            'Create one separate bucket for the largest upcoming cost.',
+          ],
+          templates: ['Annual expense calendar'],
+          localExample:
+              'If school fees of PKR 90,000 are due in six months, save PKR 15,000 per month instead of scrambling in the due month.',
         ),
       ],
       quiz: CourseQuiz(
@@ -412,9 +538,14 @@ class DemoFinanceData {
           ),
         ],
       ),
-      externalUrl: 'https://www.investopedia.com/budgeting-4427755',
+      externalUrl:
+          'https://www.khanacademy.org/college-careers-more/financial-literacy/xa6995ea67a8e9fdd:budgeting-and-saving',
       videoUrl:
-          'https://www.youtube.com/results?search_query=budgeting+for+beginners',
+          'https://www.youtube.com/results?search_query=50+30+20+budgeting+rule+Khan+Academy',
+      trackId: 'beginner',
+      localRelevance:
+          'Uses PKR salary cycles, rent, grocery inflation, and family support realities.',
+      capstone: 'Create a one-month PKR budget with a weekly review rule.',
     ),
     LessonCourse(
       id: 'smart-investing',
@@ -425,36 +556,78 @@ class DemoFinanceData {
       coverImageUrl:
           'https://images.unsplash.com/photo-1640161704729-cbe966a08476?auto=format&fit=crop&w=1200&q=80',
       category: 'Investing',
+      difficulty: 'Intermediate',
       durationMinutes: 45,
+      outcome:
+          'Build an investing framework around time horizon, risk, and diversification.',
+      pathLabel: 'Growth Path',
       rating: 4.9,
       xpReward: 260,
+      skillTags: ['Risk', 'Index funds', 'Allocation'],
       lessons: [
         Lesson(
           id: 'si-1',
           title: 'Risk and Return',
           description: 'Why higher upside usually means higher volatility',
           content:
-              'Investment risk is the price paid for expected growth. Match your portfolio to your timeline so downturns do not force bad decisions.',
+              'Investment risk is the price paid for expected growth. Cash feels safe in the short term but loses buying power when inflation is high. Stocks and equity funds can grow more, but their prices move sharply. The correct question is not "Which investment is best?" It is "When do I need this money, and how much decline can I survive without selling?" Match investments to time horizon first.',
           icon: 'trending_up',
           points: 50,
+          keyTakeaways: [
+            'Higher expected return usually brings higher volatility.',
+            'Short-term money should not depend on risky markets.',
+            'Risk capacity depends on time horizon, income stability, and emergency savings.',
+          ],
+          practiceTasks: [
+            'Label each goal as under 1 year, 1-5 years, or 5+ years.',
+            'Write the maximum temporary decline you could tolerate.',
+          ],
+          mythBusters: [
+            'Myth: Risk means something is bad. Reality: unmanaged risk is bad; intentional risk can fund long-term growth.',
+          ],
+          localExample:
+              'Money needed for university fees next year should be treated differently from retirement money needed decades later.',
         ),
         Lesson(
           id: 'si-2',
           title: 'Index Funds Explained',
           description: 'A beginner-friendly core holding',
           content:
-              'Index funds spread your money across many companies, lowering single-stock risk and keeping fees relatively low.',
+              'An index fund owns a basket of investments that follows a market index. Instead of trying to pick one winning company, the investor owns many companies through one fund. This lowers single-company risk and usually keeps fees lower than active management. Indexing is not magic and does not remove market declines, but it is a disciplined way to participate in broad market growth.',
           icon: 'stacked_line_chart',
           points: 50,
+          keyTakeaways: [
+            'Index funds reduce dependence on one company.',
+            'Fees matter because they compound against you.',
+            'Diversification helps, but it does not remove market risk.',
+          ],
+          practiceTasks: [
+            'Compare two funds by holdings, fee, and benchmark.',
+            'Write whether the fund fits a short, medium, or long-term goal.',
+          ],
+          caseStudies: [
+            'A beginner investor avoids hot stock tips and starts by learning what a broad market fund actually owns.',
+          ],
         ),
         Lesson(
           id: 'si-3',
           title: 'Asset Allocation',
           description: 'Balance growth and stability',
           content:
-              'Stocks drive growth, bonds reduce volatility, and cash supports near-term needs. The right mix depends on your horizon and tolerance.',
+              'Asset allocation is the mix between growth, stability, and liquidity. Stocks or equity funds usually drive long-term growth. Bonds, sukuk, or fixed-income funds can reduce volatility. Cash supports near-term needs. A strong allocation lets you stay invested during bad headlines because every rupee has a job: spend soon, protect, or grow.',
           icon: 'donut_large',
           points: 70,
+          keyTakeaways: [
+            'Allocation matters more than chasing one perfect product.',
+            'Cash, fixed income, and equities serve different jobs.',
+            'Revisit allocation when goals or timelines change.',
+          ],
+          practiceTasks: [
+            'Draw your current asset mix as cash, fixed income, equity, and other.',
+            'Mark which assets support goals due within two years.',
+          ],
+          localExample:
+              'A Pakistani investor may hold PKR cash for near-term needs, fixed-income or sukuk exposure for stability, and long-term growth assets for future goals.',
         ),
       ],
       quiz: CourseQuiz(
@@ -489,9 +662,14 @@ class DemoFinanceData {
           ),
         ],
       ),
-      externalUrl: 'https://www.investopedia.com/investing-4427685',
+      externalUrl: 'https://www.investopedia.com/terms/i/indexfund.asp',
       videoUrl:
-          'https://www.youtube.com/results?search_query=investing+for+beginners+index+funds',
+          'https://www.youtube.com/results?search_query=index+funds+asset+allocation+investing+for+beginners',
+      trackId: 'intermediate',
+      prerequisites: ['Budget Foundations', 'Emergency Fund Systems'],
+      localRelevance:
+          'Connects global diversification principles with Pakistani inflation and PKR currency risk.',
+      capstone: 'Draft a starter investment policy statement.',
     ),
     LessonCourse(
       id: 'credit-and-debt',
@@ -502,36 +680,78 @@ class DemoFinanceData {
       coverImageUrl:
           'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80',
       category: 'Credit',
+      difficulty: 'Starter',
       durationMinutes: 32,
+      outcome:
+          'Know how to protect your score and choose a payoff method with intent.',
+      pathLabel: 'Resilience Path',
       rating: 4.7,
       xpReward: 180,
+      skillTags: ['Credit score', 'Debt payoff', 'Borrowing'],
       lessons: [
         Lesson(
           id: 'cd-1',
           title: 'How Credit Scores Work',
           description: 'The major factors behind your score',
           content:
-              'Payment history and utilization usually matter most. Missing payments damages trust faster than opening one new account.',
+              'Creditworthiness is built through trust signals: paying on time, using only a manageable share of available credit, keeping records clean, and avoiding desperate borrowing patterns. Even when a formal score is not central, banks, lenders, landlords, and business partners still evaluate reliability. Missing payments damages trust quickly because it signals cash-flow stress.',
           icon: 'credit_score',
           points: 40,
+          keyTakeaways: [
+            'On-time payments are the strongest trust signal.',
+            'High utilization can make a borrower look stretched.',
+            'Credit health is useful even before you need a loan.',
+          ],
+          practiceTasks: [
+            'List all recurring debt payments and due dates.',
+            'Set reminders three days before each due date.',
+          ],
+          localExample:
+              'A missed installment on a phone, bike, or personal loan can affect future borrowing conversations even if the amount feels small.',
         ),
         Lesson(
           id: 'cd-2',
           title: 'Avalanche vs Snowball',
           description: 'Choose a debt payoff method',
           content:
-              'Avalanche minimizes interest paid, while snowball prioritizes psychological wins by clearing the smallest balances first.',
+              'Debt avalanche pays extra toward the highest-interest debt first, which usually saves the most money. Debt snowball pays extra toward the smallest balance first, which creates faster emotional wins. The best method is the one you can actually follow. If stress is high, snowball may build momentum; if discipline is strong, avalanche usually wins mathematically.',
           icon: 'compare_arrows',
           points: 40,
+          keyTakeaways: [
+            'Avalanche minimizes total interest.',
+            'Snowball builds motivation through quick wins.',
+            'Minimum payments continue on every debt in both methods.',
+          ],
+          practiceTasks: [
+            'List debts by balance, markup or interest rate, and minimum payment.',
+            'Choose avalanche or snowball and name the first target debt.',
+          ],
+          caseStudies: [
+            'A borrower with three debts starts with the smallest balance to feel progress, then switches to avalanche after one debt is cleared.',
+          ],
         ),
         Lesson(
           id: 'cd-3',
           title: 'Use Debt Without Letting It Use You',
           description: 'Rules for responsible borrowing',
           content:
-              'Only carry debt with a clear purpose, a payoff path, and a monthly payment that does not choke your cash flow.',
+              'Debt is not automatically evil, but it must have a purpose, a payoff path, and a payment that does not choke the household. Borrowing for productive education, a business asset, or urgent medical need is different from borrowing to maintain appearances. Before borrowing, test the payment against income, emergency savings, and family obligations.',
           icon: 'shield',
           points: 50,
+          keyTakeaways: [
+            'Borrow only with a written payoff path.',
+            'Monthly affordability is not the same as total affordability.',
+            'Debt should improve stability or solve a real need.',
+          ],
+          practiceTasks: [
+            'Calculate the payment as a percentage of take-home income.',
+            'Compare total repayment, not only monthly installment.',
+          ],
+          mythBusters: [
+            'Myth: If the monthly payment fits, the loan is safe. Reality: total repayment and income risk matter too.',
+          ],
+          localExample:
+              'A PKR 18,000 monthly installment may look affordable until rent, groceries, fuel, school fees, and family support are included.',
         ),
       ],
       quiz: CourseQuiz(
@@ -568,9 +788,13 @@ class DemoFinanceData {
         ],
       ),
       externalUrl:
-          'https://www.khanacademy.org/college-careers-more/personal-finance',
+          'https://www.consumerfinance.gov/consumer-tools/debt-collection/',
       videoUrl:
-          'https://www.youtube.com/results?search_query=debt+payoff+avalanche+snowball',
+          'https://www.youtube.com/results?search_query=debt+avalanche+vs+debt+snowball+explained',
+      trackId: 'beginner',
+      localRelevance:
+          'Uses installment plans, salary advances, BNPL, and family borrowing examples.',
+      capstone: 'Choose a payoff method and map the first 90 days.',
     ),
     LessonCourse(
       id: 'pakistan-finance-playbook',
@@ -581,36 +805,78 @@ class DemoFinanceData {
       coverImageUrl:
           'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
       category: 'Local Finance',
+      difficulty: 'Starter',
       durationMinutes: 34,
+      outcome:
+          'Adapt budgeting, saving, and borrowing decisions to local Pakistani realities.',
+      pathLabel: 'Local Money Path',
       rating: 4.9,
       xpReward: 210,
+      skillTags: ['Inflation', 'PKR savings', 'Loan choices'],
       lessons: [
         Lesson(
           id: 'pf-1',
           title: 'Budgeting for Inflation',
           description: 'Protect essentials when prices move fast',
           content:
-              'Separate fixed bills from volatile items like groceries and fuel, then review those flexible categories weekly instead of monthly.',
+              'In Pakistan, a monthly budget can go stale quickly when groceries, fuel, school transport, utilities, and medicines move faster than expected. Separate fixed costs from volatile essentials. Fixed costs need negotiation or structural change; volatile essentials need weekly review. A weekly grocery and fuel check prevents the shock from appearing only at month-end.',
           icon: 'pie_chart',
           points: 45,
+          keyTakeaways: [
+            'Inflation first shows up in flexible essential categories.',
+            'Weekly reviews beat monthly regret.',
+            'A buffer category protects the rest of the plan.',
+          ],
+          practiceTasks: [
+            'Choose three categories to review every Friday.',
+            'Add a small inflation buffer before lifestyle spending.',
+          ],
+          localExample:
+              'If groceries drift from PKR 38,000 to PKR 47,000, adjust weekly meals and supplier choices before the full month breaks.',
         ),
         Lesson(
           id: 'pf-2',
           title: 'Emergency Funds in PKR',
           description: 'Build a cushion before chasing returns',
           content:
-              'Aim for three to six months of core expenses in accessible savings so medical, job, or repair shocks do not force debt.',
+              'A PKR emergency fund should be boring, accessible, and separate from daily spending. The point is not to beat inflation; the point is to avoid high-cost debt when salary is delayed, a client pays late, a medical bill appears, or a family emergency lands. Start with one month of core expenses, then build toward three to six months.',
           icon: 'shield',
           points: 55,
+          keyTakeaways: [
+            'Emergency money needs access and stability.',
+            'One month is a meaningful starter target.',
+            'Separate emergency funds from planned annual costs.',
+          ],
+          practiceTasks: [
+            'Calculate one month of core household costs.',
+            'Set the next salary-day transfer amount.',
+          ],
+          caseStudies: [
+            'A freelancer in Lahore avoids taking a salary advance because two months of expenses are already reserved.',
+          ],
         ),
         Lesson(
           id: 'pf-3',
           title: 'Borrowing Carefully',
           description: 'Compare markup, tenure, and real repayment pressure',
           content:
-              'Do not judge a loan by monthly installment alone. Check total repayment, income ratio, and whether the purpose improves your finances.',
+              'In local loan ads, the monthly installment often gets more attention than total repayment. That is dangerous. Compare markup, fees, tenure, late penalties, collateral, and total amount paid. Also check whether the loan improves your financial position or simply moves pressure into the future. Good borrowing solves a real problem without trapping future income.',
           icon: 'credit_score',
           points: 60,
+          keyTakeaways: [
+            'Monthly installment is only one part of the decision.',
+            'Total repayment reveals the real cost.',
+            'Borrowing should have a purpose and exit plan.',
+          ],
+          practiceTasks: [
+            'Compare two loan offers by total repayment and tenure.',
+            'Write the reason the loan improves or protects your finances.',
+          ],
+          mythBusters: [
+            'Myth: Longer tenure is always easier. Reality: it can lower the payment but raise the total cost.',
+          ],
+          localExample:
+              'A PKR 500,000 loan can feel manageable monthly but become expensive if the tenure is stretched and fees are ignored.',
         ),
       ],
       quiz: CourseQuiz(
@@ -646,9 +912,981 @@ class DemoFinanceData {
           ),
         ],
       ),
-      externalUrl: 'https://www.hec.gov.pk/',
+      externalUrl: 'https://www.sbp.org.pk/finc/FL.asp',
       videoUrl:
-          'https://www.youtube.com/results?search_query=personal+finance+pakistan+budgeting',
+          'https://www.youtube.com/results?search_query=personal+finance+Pakistan+budgeting+saving+borrowing',
+      trackId: 'specialist',
+      localRelevance:
+          'Built around Pakistani salary timing, fuel and grocery volatility, committee savings, and markup comparisons.',
+      capstone: 'Build a Pakistan-specific monthly money operating system.',
+    ),
+    LessonCourse(
+      id: 'emergency-fund-systems',
+      title: 'Emergency Fund Systems',
+      subtitle: 'Build a shock absorber before life tests your budget',
+      description:
+          'Design the right cash buffer, automate savings, and decide where to keep money you may need quickly.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1579621970795-87facc2f976d?auto=format&fit=crop&w=1200&q=80',
+      category: 'Saving',
+      difficulty: 'Starter',
+      durationMinutes: 42,
+      outcome:
+          'Know your emergency fund target, storage rules, and first automated transfer.',
+      pathLabel: 'Foundation Path',
+      rating: 4.8,
+      xpReward: 230,
+      skillTags: ['Emergency fund', 'Automation', 'Cash buffer'],
+      lessons: [
+        Lesson(
+          id: 'efs-1',
+          title: 'Your Real Safety Number',
+          description: 'Calculate three, six, and nine month targets',
+          content:
+              'Start with core monthly expenses: rent, groceries, utilities, transport, school fees, medicine, and debt payments. Your first target is one month. Your strong target is three to six months.',
+          icon: 'shield',
+          points: 45,
+          keyTakeaways: [
+            'Emergency funds protect decisions, not just bills.',
+            'Core expenses are different from lifestyle spending.',
+            'A one-month starter fund creates early psychological safety.',
+          ],
+          practiceTasks: [
+            'List your non-negotiable monthly costs in PKR.',
+            'Calculate one-month and three-month emergency targets.',
+          ],
+          calculators: ['Emergency fund target calculator'],
+          localExample:
+              'If core household costs are PKR 115,000, a starter fund is PKR 115,000 and a three-month fund is PKR 345,000.',
+        ),
+        Lesson(
+          id: 'efs-2',
+          title: 'Automate Before Motivation Fades',
+          description: 'Turn saving into a monthly default',
+          content:
+              'Move money out on salary day before it blends into daily spending. Use a separate account or wallet pocket so the fund is visible but not tempting.',
+          icon: 'wallet',
+          points: 50,
+          practiceTasks: [
+            'Choose a fixed transfer amount for the next salary cycle.',
+            'Name the account or goal Emergency Fund so it has a job.',
+          ],
+          mythBusters: [
+            'Myth: Small transfers do not matter. Reality: consistency builds the first buffer.',
+            'Myth: Emergency funds should chase high returns. Reality: liquidity matters more.',
+          ],
+          templates: ['Salary-day savings rule'],
+        ),
+        Lesson(
+          id: 'efs-3',
+          title: 'When To Use It',
+          description: 'Separate emergencies from expected expenses',
+          content:
+              'Medical shocks, job gaps, urgent repairs, or family crises qualify. Eid, school fees, annual insurance, and device upgrades should be sinking funds instead.',
+          icon: 'balance',
+          points: 55,
+          caseStudies: [
+            'A Lahore freelancer keeps PKR 250,000 aside after one delayed client payment caused two months of stress.',
+          ],
+          applicationTools: ['Emergency or sinking fund decision card'],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'efs-quiz',
+        title: 'Emergency Fund Systems Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'efs-q1',
+            prompt: 'What should an emergency fund prioritize first?',
+            options: [
+              'Maximum investment return',
+              'Fast access and stability',
+              'Buying discounts',
+              'Speculative growth',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Emergency money must be available when life breaks the plan.',
+          ),
+          QuizQuestion(
+            id: 'efs-q2',
+            prompt: 'Which cost is better handled by a sinking fund?',
+            options: [
+              'A sudden hospital visit',
+              'Job loss',
+              'Annual school fees',
+              'Emergency car repair',
+            ],
+            correctIndex: 2,
+            explanation:
+                'Predictable non-monthly costs should be planned before they arrive.',
+          ),
+        ],
+      ),
+      externalUrl:
+          'https://www.consumerfinance.gov/consumer-tools/saving-money/',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=emergency+fund+explained+personal+finance',
+      trackId: 'beginner',
+      prerequisites: ['Budget Foundations'],
+      localRelevance:
+          'Uses PKR emergency targets, family support obligations, and delayed income examples.',
+      capstone: 'Create a two-stage emergency fund plan.',
+    ),
+    LessonCourse(
+      id: 'spending-behavior-lab',
+      title: 'Spending Behavior Lab',
+      subtitle: 'Understand why budgets fail and design better habits',
+      description:
+          'Learn the psychology of impulse spending, social pressure, and decision fatigue so your money plan survives real life.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1200&q=80',
+      category: 'Behavior',
+      difficulty: 'Starter',
+      durationMinutes: 36,
+      outcome:
+          'Identify your top spending triggers and build a weekly money reset ritual.',
+      pathLabel: 'Foundation Path',
+      rating: 4.7,
+      xpReward: 190,
+      skillTags: ['Habits', 'Impulse control', 'Weekly review'],
+      lessons: [
+        Lesson(
+          id: 'sbl-1',
+          title: 'Find Your Spending Triggers',
+          description: 'Spot emotional and social spending patterns',
+          content:
+              'Every overspend has a trigger: fatigue, boredom, convenience, family pressure, or status. Track the moment before the purchase, not only the purchase itself.',
+          icon: 'pie_chart',
+          points: 40,
+          practiceTasks: [
+            'Mark three recent purchases as need, joy, pressure, or fatigue.',
+            'Create one friction rule for your biggest trigger.',
+          ],
+          templates: ['Trigger audit worksheet'],
+        ),
+        Lesson(
+          id: 'sbl-2',
+          title: 'The 24-Hour Pause',
+          description: 'Use delay as a financial defense',
+          content:
+              'For non-essential purchases above a threshold, wait one day. The goal is not deprivation. The goal is buying with a clear mind.',
+          icon: 'balance',
+          points: 45,
+          mythBusters: [
+            'Myth: Discipline means never enjoying money. Reality: good spending is planned spending.',
+          ],
+          applicationTools: ['Pause threshold rule'],
+        ),
+        Lesson(
+          id: 'sbl-3',
+          title: 'Weekly Money Reset',
+          description: 'Make progress visible before the month ends',
+          content:
+              'A five-minute weekly reset checks category drift, upcoming bills, and one decision for next week. Monthly reviews are often too late.',
+          icon: 'wallet',
+          points: 45,
+          caseStudies: [
+            'A Karachi household reduced food delivery spending by setting a Friday review and a weekly dining cap.',
+          ],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'sbl-quiz',
+        title: 'Spending Behavior Lab Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'sbl-q1',
+            prompt: 'What should you track to understand impulse spending?',
+            options: [
+              'Only the amount spent',
+              'The trigger before the purchase',
+              'Only the store name',
+              'Only your monthly income',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Triggers reveal why the purchase happened and how to design friction.',
+          ),
+          QuizQuestion(
+            id: 'sbl-q2',
+            prompt: 'Why do weekly reviews help?',
+            options: [
+              'They replace income',
+              'They catch drift before month-end',
+              'They remove all bills',
+              'They guarantee investment returns',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Short review cycles make small corrections easier and less stressful.',
+          ),
+        ],
+      ),
+      externalUrl:
+          'https://www.consumerfinance.gov/consumer-tools/managing-your-money/',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=psychology+of+spending+money+personal+finance',
+      trackId: 'beginner',
+      localRelevance:
+          'Includes food delivery, weddings, family expectations, and status purchases in PKR.',
+      capstone: 'Build one spending rule for your biggest trigger.',
+    ),
+    LessonCourse(
+      id: 'insurance-risk-protection',
+      title: 'Insurance and Risk Protection',
+      subtitle: 'Protect your household from expensive surprises',
+      description:
+          'Understand health, life, property, and income protection decisions without overbuying or staying exposed.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80',
+      category: 'Protection',
+      difficulty: 'Intermediate',
+      durationMinutes: 48,
+      outcome:
+          'Prioritize the protection products that match your household risk.',
+      pathLabel: 'Protection Path',
+      rating: 4.8,
+      xpReward: 240,
+      skillTags: ['Insurance', 'Risk', 'Family protection'],
+      lessons: [
+        Lesson(
+          id: 'irp-1',
+          title: 'Risk Transfer Basics',
+          description: 'Know which risks to insure and which to self-fund',
+          content:
+              'Insurance makes sense when a low-probability event would create a high-cost loss. Smaller predictable costs are better handled with savings.',
+          icon: 'shield',
+          points: 55,
+          keyTakeaways: [
+            'Insure catastrophic risks first.',
+            'Deductibles and exclusions matter as much as premiums.',
+          ],
+          calculators: ['Coverage priority matrix'],
+        ),
+        Lesson(
+          id: 'irp-2',
+          title: 'Reading Policy Fine Print',
+          description: 'Compare exclusions, waiting periods, and claim rules',
+          content:
+              'A cheap policy can be expensive if it excludes the risk you actually face. Compare claim process, hospital network, exclusions, and renewal rules.',
+          icon: 'balance',
+          points: 55,
+          practiceTasks: [
+            'Compare two policies using premium, coverage, exclusions, and claim process.',
+          ],
+          templates: ['Policy comparison checklist'],
+        ),
+        Lesson(
+          id: 'irp-3',
+          title: 'Family Protection Map',
+          description: 'Decide coverage based on dependents and obligations',
+          content:
+              'A person with dependents needs a different plan than a single earner with no debt. Cover income replacement, medical shocks, and major liabilities.',
+          icon: 'wallet',
+          points: 60,
+          caseStudies: [
+            'A sole earner in Faisalabad maps school fees and rent before choosing life cover.',
+          ],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'irp-quiz',
+        title: 'Insurance and Risk Protection Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'irp-q1',
+            prompt: 'Which risk should usually be insured first?',
+            options: [
+              'Tiny routine repairs',
+              'Low-cost predictable purchases',
+              'Catastrophic losses a family cannot absorb',
+              'Monthly entertainment',
+            ],
+            correctIndex: 2,
+            explanation:
+                'Insurance is strongest for severe losses that would damage household stability.',
+          ),
+          QuizQuestion(
+            id: 'irp-q2',
+            prompt: 'What can make a cheap policy risky?',
+            options: [
+              'Clear claim process',
+              'Strong hospital network',
+              'Important exclusions',
+              'Transparent renewal rules',
+            ],
+            correctIndex: 2,
+            explanation:
+                'Exclusions can remove protection exactly where the family needs it.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.investopedia.com/insurance-4427716',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=insurance+basics+health+life+personal+finance',
+      trackId: 'intermediate',
+      prerequisites: ['Emergency Fund Systems'],
+      localRelevance:
+          'Frames decisions around Pakistani hospital networks, family dependents, and claim reliability.',
+      capstone: 'Create a household risk protection map.',
+    ),
+    LessonCourse(
+      id: 'tax-salary-planning-pakistan',
+      title: 'Pakistan Tax and Salary Planning',
+      subtitle: 'Understand filer status, salary tax, and documentation',
+      description:
+          'Learn the practical tax basics a Pakistani earner needs: records, deductions, withholding, and filer awareness.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80',
+      category: 'Taxes',
+      difficulty: 'Intermediate',
+      durationMinutes: 52,
+      outcome:
+          'Build a clean tax document folder and understand how tax affects real take-home pay.',
+      pathLabel: 'Pakistan Money Path',
+      rating: 4.9,
+      xpReward: 270,
+      skillTags: ['Taxes', 'Filer status', 'Salary planning'],
+      lessons: [
+        Lesson(
+          id: 'tsp-1',
+          title: 'Gross Pay vs Take-Home Pay',
+          description: 'See how deductions change your real income',
+          content:
+              'A salary offer is not the same as usable monthly cash. Track tax, provident fund, loan deductions, and any reimbursements separately.',
+          icon: 'receipt',
+          points: 55,
+          calculators: ['Take-home pay estimator'],
+          localExample:
+              'A PKR 250,000 gross salary can feel very different after withholding, provident fund, and transport costs.',
+        ),
+        Lesson(
+          id: 'tsp-2',
+          title: 'Filer Awareness',
+          description: 'Know why documentation matters',
+          content:
+              'Filer status can affect withholding and financial credibility. Keep salary certificates, bank statements, tax certificates, and investment records organized.',
+          icon: 'stacked_line_chart',
+          points: 60,
+          templates: ['Annual tax document checklist'],
+          mythBusters: [
+            'Myth: Taxes matter only for business owners. Reality: salaried people also need records and planning.',
+          ],
+        ),
+        Lesson(
+          id: 'tsp-3',
+          title: 'Planning Without Guesswork',
+          description: 'Use records to make better money decisions',
+          content:
+              'A tax folder helps with loan applications, visa paperwork, business registration, and investment tracking. Good records reduce stress.',
+          icon: 'wallet',
+          points: 55,
+          applicationTools: ['Document folder map'],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'tsp-quiz',
+        title: 'Pakistan Tax and Salary Planning Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'tsp-q1',
+            prompt: 'What is take-home pay?',
+            options: [
+              'Gross salary before deductions',
+              'Money available after deductions',
+              'Only annual bonus',
+              'Only tax refund',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Take-home pay is what actually reaches your usable monthly cash flow.',
+          ),
+          QuizQuestion(
+            id: 'tsp-q2',
+            prompt: 'Why keep a tax document folder?',
+            options: [
+              'To avoid budgeting',
+              'To support filings, loans, and financial decisions',
+              'To increase spending',
+              'To replace emergency savings',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Organized records make tax, credit, and planning decisions easier.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.fbr.gov.pk/',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=Pakistan+income+tax+filer+non+filer+basics',
+      trackId: 'intermediate',
+      prerequisites: ['Budget Foundations'],
+      localRelevance:
+          'Focused on Pakistani salary records, filer awareness, withholding, and PKR planning.',
+      capstone: 'Build a tax-ready document folder for the current year.',
+    ),
+    LessonCourse(
+      id: 'portfolio-construction',
+      title: 'Portfolio Construction',
+      subtitle: 'Move from random investments to an intentional strategy',
+      description:
+          'Build a portfolio around goals, time horizon, diversification, rebalancing, and risk controls.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
+      category: 'Investing',
+      difficulty: 'Advanced',
+      durationMinutes: 64,
+      outcome: 'Create an investment policy statement and a rebalancing rule.',
+      pathLabel: 'Wealth Path',
+      rating: 4.9,
+      xpReward: 330,
+      skillTags: ['Asset allocation', 'Rebalancing', 'Risk control'],
+      lessons: [
+        Lesson(
+          id: 'pc-1',
+          title: 'Goals Before Products',
+          description: 'Match each investment to a time horizon',
+          content:
+              'Before choosing assets, define the job: emergency money, home down payment, education, retirement, or wealth growth. Different jobs need different risk.',
+          icon: 'donut_large',
+          points: 65,
+          practiceTasks: [
+            'Label each current investment with its goal and time horizon.',
+          ],
+          templates: ['Investment policy statement starter'],
+        ),
+        Lesson(
+          id: 'pc-2',
+          title: 'Rebalancing Rules',
+          description: 'Control drift without chasing headlines',
+          content:
+              'Rebalancing brings a portfolio back to target allocation. Use calendar rules or percentage bands instead of emotional reactions.',
+          icon: 'compare_arrows',
+          points: 70,
+          calculators: ['Rebalancing band calculator'],
+        ),
+        Lesson(
+          id: 'pc-3',
+          title: 'Currency and Concentration Risk',
+          description: 'Think beyond one market and one currency',
+          content:
+              'PKR savers face local inflation and currency risk. Diversification can include asset classes, sectors, geographies, and liquidity buckets.',
+          icon: 'trending_up',
+          points: 70,
+          caseStudies: [
+            'A family saving for overseas education separates PKR near-term cash from long-term growth assets.',
+          ],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'pc-quiz',
+        title: 'Portfolio Construction Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'pc-q1',
+            prompt: 'What should come before choosing an investment product?',
+            options: [
+              'Social media hype',
+              'A defined goal and time horizon',
+              'Only last month performance',
+              'A friend recommendation',
+            ],
+            correctIndex: 1,
+            explanation:
+                'The goal determines liquidity needs, risk capacity, and suitable assets.',
+          ),
+          QuizQuestion(
+            id: 'pc-q2',
+            prompt: 'What does rebalancing do?',
+            options: [
+              'Guarantees profits',
+              'Returns allocation toward target weights',
+              'Eliminates all risk',
+              'Avoids taxes automatically',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Rebalancing controls portfolio drift and supports discipline.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.investopedia.com/portfolio-management-4689745',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=portfolio+construction+asset+allocation+rebalancing',
+      trackId: 'advanced',
+      prerequisites: ['Smart Investing'],
+      localRelevance:
+          'Covers PKR inflation, currency exposure, and concentration risk for Pakistani investors.',
+      capstone: 'Write a one-page investment policy statement.',
+    ),
+    LessonCourse(
+      id: 'retirement-fire-planning',
+      title: 'Retirement and FIRE Planning',
+      subtitle: 'Calculate freedom targets and long-term contribution plans',
+      description:
+          'Learn retirement math, withdrawal rates, inflation assumptions, and sustainable contribution habits.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+      category: 'Retirement',
+      difficulty: 'Advanced',
+      durationMinutes: 58,
+      outcome:
+          'Estimate a retirement number and monthly contribution gap in PKR.',
+      pathLabel: 'Wealth Path',
+      rating: 4.8,
+      xpReward: 310,
+      skillTags: ['Retirement', 'FIRE', 'Compounding'],
+      lessons: [
+        Lesson(
+          id: 'rfp-1',
+          title: 'Your Freedom Number',
+          description: 'Estimate how much capital future you needs',
+          content:
+              'A retirement number depends on annual spending, inflation, expected returns, family responsibilities, and desired safety margin.',
+          icon: 'stacked_line_chart',
+          points: 65,
+          calculators: ['Retirement number estimator'],
+        ),
+        Lesson(
+          id: 'rfp-2',
+          title: 'Contribution Rate Design',
+          description: 'Turn a distant goal into a monthly action',
+          content:
+              'A contribution plan connects current income to future independence. Increase contributions after raises before lifestyle inflation absorbs them.',
+          icon: 'wallet',
+          points: 65,
+          practiceTasks: [
+            'Calculate your current monthly investing rate as a percentage of income.',
+          ],
+        ),
+        Lesson(
+          id: 'rfp-3',
+          title: 'Withdrawal Rate Caution',
+          description: 'Understand why rules are starting points',
+          content:
+              'Withdrawal rules are not guarantees. Local inflation, currency risk, taxes, and family support can require a larger margin.',
+          icon: 'shield',
+          points: 65,
+          mythBusters: [
+            'Myth: One global retirement rule fits every country. Reality: assumptions need local adjustment.',
+          ],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'rfp-quiz',
+        title: 'Retirement and FIRE Planning Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'rfp-q1',
+            prompt: 'What shapes a retirement number?',
+            options: [
+              'Only age',
+              'Future spending, inflation, returns, and safety margin',
+              'Only current rent',
+              'Only bank balance today',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Retirement planning combines future expenses, assumptions, and risk buffers.',
+          ),
+          QuizQuestion(
+            id: 'rfp-q2',
+            prompt: 'When is a good time to raise contributions?',
+            options: [
+              'After every raise before lifestyle inflation expands',
+              'Only after retirement',
+              'Never',
+              'Only after debt grows',
+            ],
+            correctIndex: 0,
+            explanation:
+                'Capturing raises helps grow contributions without feeling like a cut.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.investopedia.com/retirement-planning-4689695',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=retirement+planning+FIRE+financial+independence',
+      trackId: 'advanced',
+      prerequisites: ['Portfolio Construction'],
+      localRelevance:
+          'Adjusts retirement assumptions for PKR inflation, family support, and currency risk.',
+      capstone: 'Estimate your retirement number and next contribution step.',
+    ),
+    LessonCourse(
+      id: 'business-finance-essentials',
+      title: 'Business Finance Essentials',
+      subtitle: 'Manage cash flow, margins, inventory, and growth decisions',
+      description:
+          'A practical finance course for freelancers, shopkeepers, creators, and small business owners.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=1200&q=80',
+      category: 'Business',
+      difficulty: 'Advanced',
+      durationMinutes: 62,
+      outcome:
+          'Understand profit, cash flow, pricing, and runway before scaling.',
+      pathLabel: 'Business Path',
+      rating: 4.9,
+      xpReward: 320,
+      skillTags: ['Cash flow', 'Pricing', 'Runway'],
+      lessons: [
+        Lesson(
+          id: 'bfe-1',
+          title: 'Profit Is Not Cash',
+          description: 'Separate accounting profit from money in the bank',
+          content:
+              'A business can be profitable and still run out of cash because inventory, receivables, and debt payments absorb money.',
+          icon: 'wallet',
+          points: 65,
+          caseStudies: [
+            'A shop has strong sales but cannot restock because too much cash is stuck in credit sales.',
+          ],
+          calculators: ['Cash conversion cycle worksheet'],
+        ),
+        Lesson(
+          id: 'bfe-2',
+          title: 'Pricing With Margins',
+          description: 'Know your real cost before setting price',
+          content:
+              'Price should cover product cost, delivery, platform fees, returns, taxes, packaging, your time, and profit. Revenue alone is vanity.',
+          icon: 'receipt',
+          points: 70,
+          templates: ['Unit economics calculator'],
+        ),
+        Lesson(
+          id: 'bfe-3',
+          title: 'Runway and Growth',
+          description: 'Decide when expansion is safe',
+          content:
+              'Runway is how many months the business can survive at current burn. Growth should not destroy the cash buffer needed for operations.',
+          icon: 'trending_up',
+          points: 65,
+          applicationTools: ['Runway calculator'],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'bfe-quiz',
+        title: 'Business Finance Essentials Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'bfe-q1',
+            prompt: 'Why can a profitable business still struggle?',
+            options: [
+              'Profit always equals cash',
+              'Cash can be tied in inventory and receivables',
+              'Sales never matter',
+              'Margins are irrelevant',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Timing matters. Cash flow can break a business before profit appears.',
+          ),
+          QuizQuestion(
+            id: 'bfe-q2',
+            prompt: 'What should pricing include?',
+            options: [
+              'Only product cost',
+              'All costs, time, risk, and profit margin',
+              'Only competitor price',
+              'Only shipping',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Sustainable pricing includes total cost and a fair margin.',
+          ),
+        ],
+      ),
+      externalUrl:
+          'https://www.investopedia.com/articles/pf/08/small-business-finance.asp',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=small+business+finance+cash+flow+pricing+basics',
+      trackId: 'advanced',
+      localRelevance:
+          'Built for Pakistani freelancers, ecommerce sellers, shopkeepers, and service businesses.',
+      capstone: 'Build a one-page business finance dashboard.',
+    ),
+    LessonCourse(
+      id: 'islamic-finance-halal-investing',
+      title: 'Islamic Finance and Halal Investing',
+      subtitle: 'Understand riba, risk-sharing, sukuk, and screening',
+      description:
+          'A practical Shariah-aware introduction to Islamic finance principles and halal investing decisions.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=1200&q=80',
+      category: 'Islamic Finance',
+      difficulty: 'Specialist',
+      durationMinutes: 55,
+      outcome:
+          'Evaluate money decisions using risk-sharing, asset-backing, and ethical screening principles.',
+      pathLabel: 'Islamic Finance Path',
+      rating: 4.9,
+      xpReward: 300,
+      skillTags: ['Riba awareness', 'Sukuk', 'Halal screening'],
+      lessons: [
+        Lesson(
+          id: 'ifh-1',
+          title: 'Riba and Risk-Sharing',
+          description: 'Understand the principle before the product',
+          content:
+              'Islamic finance emphasizes fairness, asset-backing, risk-sharing, and avoiding prohibited income sources. Always separate principle from marketing.',
+          icon: 'balance',
+          points: 60,
+          mythBusters: [
+            'Myth: A product is halal because the label says Islamic. Reality: structure and scholar review matter.',
+          ],
+          applicationTools: ['Shariah review question list'],
+        ),
+        Lesson(
+          id: 'ifh-2',
+          title: 'Sukuk vs Bonds',
+          description: 'Compare ownership-based certificates and debt claims',
+          content:
+              'Sukuk are commonly structured around ownership or usufruct in an asset, while conventional bonds are debt obligations with interest.',
+          icon: 'stacked_line_chart',
+          points: 65,
+          keyTakeaways: [
+            'Sukuk structure matters.',
+            'Risk is not removed just because a product is Shariah-compliant.',
+          ],
+        ),
+        Lesson(
+          id: 'ifh-3',
+          title: 'Halal Stock Screening',
+          description: 'Check business activity and financial ratios',
+          content:
+              'Screening often reviews core business activity, interest-bearing debt, cash and receivables, and impure income. Standards can differ, so know the methodology.',
+          icon: 'shield',
+          points: 65,
+          templates: ['Halal investment due diligence checklist'],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'ifh-quiz',
+        title: 'Islamic Finance and Halal Investing Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'ifh-q1',
+            prompt: 'What should you check beyond an Islamic label?',
+            options: [
+              'Product color',
+              'Structure, scholar review, and underlying activity',
+              'Only the advertisement',
+              'Only expected return',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Shariah-aware decisions require understanding structure and compliance review.',
+          ),
+          QuizQuestion(
+            id: 'ifh-q2',
+            prompt: 'What is a key halal stock screening area?',
+            options: [
+              'Business activity and financial ratios',
+              'Logo design',
+              'Only share price',
+              'Only social media popularity',
+            ],
+            correctIndex: 0,
+            explanation:
+                'Screening reviews both what the company does and how it is financed.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.investopedia.com/terms/i/islamicbanking.asp',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=islamic+finance+halal+investing+sukuk+basics',
+      trackId: 'specialist',
+      prerequisites: ['Smart Investing'],
+      localRelevance:
+          'Designed for Pakistani Muslims comparing Islamic banking, sukuk, and halal investing choices.',
+      capstone: 'Review one investment using a Shariah-aware checklist.',
+    ),
+    LessonCourse(
+      id: 'zakat-wealth-purification',
+      title: 'Zakat and Wealth Purification',
+      subtitle: 'Calculate, plan, and document annual giving obligations',
+      description:
+          'Learn practical zakat planning for cash, gold, investments, business inventory, and liabilities.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1607863680198-23d4b2565df0?auto=format&fit=crop&w=1200&q=80',
+      category: 'Islamic Finance',
+      difficulty: 'Specialist',
+      durationMinutes: 44,
+      outcome:
+          'Prepare a zakat inventory and annual reminder system with clear documentation.',
+      pathLabel: 'Islamic Finance Path',
+      rating: 4.8,
+      xpReward: 250,
+      skillTags: ['Zakat', 'Gold', 'Giving plan'],
+      lessons: [
+        Lesson(
+          id: 'zwp-1',
+          title: 'Build a Zakat Inventory',
+          description: 'List cash, gold, investments, and business assets',
+          content:
+              'A zakat calculation begins with a clear inventory. Separate personal use assets from zakatable wealth and document values on your zakat date.',
+          icon: 'wallet',
+          points: 55,
+          templates: ['Zakat inventory sheet'],
+          localExample:
+              'Record PKR bank balances, gold market value, mutual funds, receivables, and business stock where relevant.',
+        ),
+        Lesson(
+          id: 'zwp-2',
+          title: 'Liabilities and Timing',
+          description: 'Understand what may reduce the base',
+          content:
+              'Short-term liabilities due around the zakat date may affect calculations. Because scholarly opinions can differ, keep notes and consult qualified guidance.',
+          icon: 'balance',
+          points: 55,
+          mythBusters: [
+            'Myth: Zakat planning is only for the wealthy. Reality: a simple yearly inventory helps many households.',
+          ],
+        ),
+        Lesson(
+          id: 'zwp-3',
+          title: 'Giving With Intention',
+          description: 'Turn obligation into a planned annual practice',
+          content:
+              'Set a zakat date, maintain evidence, and choose eligible recipients or organizations with care.',
+          icon: 'shield',
+          points: 50,
+          applicationTools: ['Annual zakat reminder plan'],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'zwp-quiz',
+        title: 'Zakat and Wealth Purification Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'zwp-q1',
+            prompt: 'What is the first practical step in zakat planning?',
+            options: [
+              'Guessing the amount',
+              'Building a wealth inventory',
+              'Ignoring investments',
+              'Only checking salary',
+            ],
+            correctIndex: 1,
+            explanation:
+                'A documented inventory makes the calculation more reliable.',
+          ),
+          QuizQuestion(
+            id: 'zwp-q2',
+            prompt: 'Why set a zakat date?',
+            options: [
+              'To avoid documentation',
+              'To create consistency and annual discipline',
+              'To reduce all obligations to zero',
+              'To replace budgeting',
+            ],
+            correctIndex: 1,
+            explanation:
+                'A consistent date keeps records and annual planning clear.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.islamic-relief.org/zakat/zakat-faqs/',
+      videoUrl:
+          'https://www.youtube.com/results?search_query=zakat+calculation+cash+gold+investments+basics',
+      trackId: 'specialist',
+      localRelevance:
+          'Uses PKR, gold value, family obligations, business inventory, and local documentation needs.',
+      capstone: 'Prepare a draft zakat inventory for your next zakat date.',
+    ),
+    LessonCourse(
+      id: 'wealth-building-systems',
+      title: 'Wealth Building Systems',
+      subtitle: 'Grow net worth with income, ownership, and discipline',
+      description:
+          'Study the levers of long-term wealth: savings rate, income growth, ownership, taxes, risk, and behavior.',
+      coverImageUrl:
+          'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=1200&q=80',
+      category: 'Wealth',
+      difficulty: 'Advanced',
+      durationMinutes: 60,
+      outcome:
+          'Create a personal wealth dashboard with net worth, savings rate, and next growth lever.',
+      pathLabel: 'Wealth Path',
+      rating: 4.9,
+      xpReward: 340,
+      skillTags: ['Net worth', 'Income growth', 'Ownership'],
+      lessons: [
+        Lesson(
+          id: 'wbs-1',
+          title: 'Net Worth Dashboard',
+          description: 'Measure assets, liabilities, and progress',
+          content:
+              'Net worth is assets minus liabilities. Track it quarterly so daily market noise does not distort your long-term view.',
+          icon: 'stacked_line_chart',
+          points: 65,
+          templates: ['Net worth tracker'],
+        ),
+        Lesson(
+          id: 'wbs-2',
+          title: 'Savings Rate Beats Vibes',
+          description: 'Use one number to see wealth momentum',
+          content:
+              'Savings rate shows the percentage of income you keep and invest. It is one of the clearest signals of future flexibility.',
+          icon: 'pie_chart',
+          points: 65,
+          calculators: ['Savings rate calculator'],
+        ),
+        Lesson(
+          id: 'wbs-3',
+          title: 'Own Productive Assets',
+          description: 'Move from consumption to ownership',
+          content:
+              'Long-term wealth usually comes from owning productive assets: businesses, diversified investments, skills, and intellectual property.',
+          icon: 'trending_up',
+          points: 70,
+          caseStudies: [
+            'A salaried professional builds wealth by raising savings rate, improving skills, and investing consistently instead of chasing hot tips.',
+          ],
+        ),
+      ],
+      quiz: CourseQuiz(
+        id: 'wbs-quiz',
+        title: 'Wealth Building Systems Quiz',
+        questions: [
+          QuizQuestion(
+            id: 'wbs-q1',
+            prompt: 'What is net worth?',
+            options: [
+              'Monthly salary only',
+              'Assets minus liabilities',
+              'Credit card limit',
+              'Annual spending',
+            ],
+            correctIndex: 1,
+            explanation:
+                'Net worth captures what you own after subtracting what you owe.',
+          ),
+          QuizQuestion(
+            id: 'wbs-q2',
+            prompt: 'Why track savings rate?',
+            options: [
+              'It shows how much income turns into future flexibility',
+              'It guarantees no risk',
+              'It replaces income growth',
+              'It avoids all taxes',
+            ],
+            correctIndex: 0,
+            explanation:
+                'Savings rate connects income, spending, and wealth-building capacity.',
+          ),
+        ],
+      ),
+      externalUrl: 'https://www.investopedia.com/wealth-management-4689749',
+      videoUrl:
+          'https://youtu.be/HqdMV0mWO-8?si=eJQAQCtCkAaWbLlF',
+      trackId: 'advanced',
+      prerequisites: ['Portfolio Construction', 'Retirement and FIRE Planning'],
+      localRelevance:
+          'Applies wealth principles to PKR income, local inflation, family responsibilities, and career growth.',
+      capstone: 'Create a quarterly wealth dashboard.',
     ),
   ];
 
@@ -672,6 +1910,12 @@ class DemoFinanceData {
         return Icons.compare_arrows_rounded;
       case 'shield':
         return Icons.shield_rounded;
+      case 'receipt':
+        return Icons.receipt_long_rounded;
+      case 'school':
+        return Icons.school_rounded;
+      case 'mosque':
+        return Icons.mosque_rounded;
       default:
         return Icons.school_rounded;
     }
