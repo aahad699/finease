@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../app_constants.dart';
 import '../models/budget_plan.dart';
 import '../models/saving_goal.dart';
@@ -564,6 +565,132 @@ class FirestoreService {
               )
               .toList(),
         );
+  }
+
+  Stream<Map<String, dynamic>> getMarketplaceUserState() {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('marketplace_state')
+        .doc('default')
+        .snapshots()
+        .map((doc) => doc.data() ?? const <String, dynamic>{});
+  }
+
+  Future<void> saveMarketplaceOnboarding({
+    required String intent,
+    required String riskProfile,
+    required String timeHorizon,
+    required String preferredOutcome,
+  }) {
+    return _db.collection('users').doc(uid).set({
+      'marketplaceIntent': intent,
+      'marketplaceRiskProfile': riskProfile,
+      'marketplaceTimeHorizon': timeHorizon,
+      'marketplacePreferredOutcome': preferredOutcome,
+      'marketplaceOnboardedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> setMarketplacePartnerSavedState({
+    required String partnerId,
+    required String field,
+    required bool saved,
+  }) {
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('marketplace_state')
+        .doc('default');
+    return ref.set({
+      field: saved
+          ? FieldValue.arrayUnion([partnerId])
+          : FieldValue.arrayRemove([partnerId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> markMarketplacePartnerViewed(String partnerId) {
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('marketplace_state')
+        .doc('default');
+    return ref
+        .set({
+          'recentlyViewedIds': FieldValue.arrayRemove([partnerId]),
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true))
+        .then(
+          (_) => ref.set({
+            'recentlyViewedIds': FieldValue.arrayUnion([partnerId]),
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true)),
+        );
+  }
+
+  Future<void> saveMarketplaceComparisonHistory(List<String> partnerIds) async {
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('marketplace_state')
+        .doc('default');
+    await ref.collection('comparison_history').add({
+      'partnerIds': partnerIds,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    await ref.set({
+      'lastComparedPartnerIds': partnerIds,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> logMarketplaceEvent(
+    String eventName, {
+    Map<String, dynamic>? payload,
+  }) async {
+    try {
+      await _db
+          .collection('users')
+          .doc(uid)
+          .collection('marketplace_events')
+          .add({
+            'eventName': eventName,
+            'payload': payload ?? const <String, dynamic>{},
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+    } catch (error, stackTrace) {
+      debugPrint(
+        '[FirestoreService] marketplace analytics failed: $eventName - $error',
+      );
+      debugPrint('$stackTrace');
+    }
+  }
+
+  Future<DocumentReference<Map<String, dynamic>>> createMarketplaceLead({
+    required String partnerId,
+    required String partnerName,
+    required String category,
+    required String applicantName,
+    required String contact,
+    Map<String, dynamic>? context,
+  }) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('marketplace_leads')
+        .add({
+          'partnerId': partnerId,
+          'partnerName': partnerName,
+          'category': category,
+          'applicantName': applicantName,
+          'contact': contact,
+          'status': 'started',
+          'source': 'marketplace_detail',
+          'context': context ?? const <String, dynamic>{},
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
   }
 
   Future<void> toggleForumLike(String postId, bool liked) async {
