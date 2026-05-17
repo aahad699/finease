@@ -11,6 +11,7 @@ class AppTheme {
   static const Color textPrimary = Color(0xFF0B1C30);
   static const Color textSecondary = Color(0xFF464652);
   static const Color border = Color(0xFFE2E8F0);
+  static const Color charcoal = Color(0xFF0D1B2A); 
 
   // Extras used by new pages
   static const Color success = Color(0xFF059669);

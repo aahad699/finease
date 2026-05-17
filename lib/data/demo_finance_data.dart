@@ -1881,7 +1881,7 @@ class DemoFinanceData {
       ),
       externalUrl: 'https://www.investopedia.com/wealth-management-4689749',
       videoUrl:
-          'https://youtu.be/HqdMV0mWO-8?si=eJQAQCtCkAaWbLlF',
+          'https://www.youtube.com/watch?si=eJQAQCtCkAaWbLlF&v=HqdMV0mWO-8&feature=youtu.be',
       trackId: 'advanced',
       prerequisites: ['Portfolio Construction', 'Retirement and FIRE Planning'],
       localRelevance:
