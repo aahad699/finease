@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:local_auth/local_auth.dart';
 import '../../services/auth_service.dart';
 import 'signup_page.dart';
 
@@ -20,7 +19,6 @@ class _LoginPageState extends State<LoginPage>
   final _passCtrl = TextEditingController();
   final _emailFocus = FocusNode();
   final _passFocus = FocusNode();
-  final LocalAuthentication _localAuth = LocalAuthentication();
 
   bool _isLoading = false;
   bool _showPass = false;
@@ -36,7 +34,6 @@ class _LoginPageState extends State<LoginPage>
   late Animation<double> _shakeAnim;
 
   static const Color _primary = Color(0xFF2E3192);
-  static const Color _dark = Color(0xFF1A1A1A);
   static const Color _error = Color(0xFFEF4444);
 
   @override
@@ -127,6 +124,9 @@ class _LoginPageState extends State<LoginPage>
       ).signInWithEmail(_emailCtrl.text.trim(), _passCtrl.text);
       // Reset on success
       _failedAttempts = 0;
+      if (mounted) {
+        await _offerBiometricSetup();
+      }
     } on Exception catch (e) {
       if (mounted) {
         _failedAttempts++;
@@ -298,23 +298,122 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
+  Future<void> _completeEmailLinkManually() async {
+    final email = _emailCtrl.text.trim();
+    final auth = Provider.of<AuthService>(context, listen: false);
+    if (email.isEmpty || _validateEmail(email) != null) {
+      _showSnack(
+        'Enter the same email first, then paste the login link.',
+        isError: true,
+      );
+      return;
+    }
+    final linkCtrl = TextEditingController();
+    final link = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Paste password-less link',
+          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800),
+        ),
+        content: TextField(
+          controller: linkCtrl,
+          minLines: 2,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: 'Paste the sign-in link from your email',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, linkCtrl.text.trim()),
+            child: const Text('Sign In'),
+          ),
+        ],
+      ),
+    );
+    if (link == null || link.isEmpty) return;
+    setState(() => _isLoading = true);
+    try {
+      final ok = await auth.signInWithEmailLinkIfValid(
+        email: email,
+        link: link,
+      );
+      if (mounted) {
+        _showSnack(
+          ok
+              ? 'Password-less sign-in complete.'
+              : 'That link is not a valid sign-in link.',
+          isError: !ok,
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        _showSnack(
+          'Could not complete password-less sign-in: $error',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _offerBiometricSetup() async {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    if (auth.isBiometricEnabled || !await auth.canUseBiometrics()) return;
+    if (!mounted) return;
+    final enable = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Enable biometric login?'),
+        content: const Text(
+          'Use Touch ID or Face ID next time instead of typing your password.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Not now'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Enable'),
+          ),
+        ],
+      ),
+    );
+    if (enable == true) {
+      await auth.enableBiometricLogin(
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text,
+      );
+    }
+  }
+
   Future<void> _biometricLogin() async {
     try {
-      final canAuth =
-          await _localAuth.canCheckBiometrics ||
-          await _localAuth.isDeviceSupported();
-      if (!canAuth) {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      if (!await auth.canUseBiometrics()) {
         _showSnack(
           'Biometric authentication not available on this device.',
           isError: true,
         );
         return;
       }
-      final didAuth = await _localAuth.authenticate(
-        localizedReason: 'Authenticate to login to FinEase',
-      );
-      if (didAuth && mounted) {
-        _showSnack('✅ Biometric authentication successful!');
+      final didAuth = await auth.authenticateWithBiometrics();
+      if (mounted) {
+        _showSnack(
+          didAuth
+              ? 'Biometric login successful.'
+              : 'Biometric login is not enabled yet. Sign in with password once to enable it.',
+          isError: !didAuth,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -329,7 +428,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background blobs
@@ -375,7 +474,7 @@ class _LoginPageState extends State<LoginPage>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
@@ -398,7 +497,7 @@ class _LoginPageState extends State<LoginPage>
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 30,
                           fontWeight: FontWeight.w800,
-                          color: _dark,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: -1,
                         ),
                       ),
@@ -407,7 +506,7 @@ class _LoginPageState extends State<LoginPage>
                         'Securely access your financial world.',
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           height: 1.5,
                         ),
                       ),
@@ -421,13 +520,13 @@ class _LoginPageState extends State<LoginPage>
                       const SizedBox(height: 36),
 
                       // ── Email ──
-                      _fieldLabel('Email Address'),
+                      _fieldLabel(context, 'Email Address'),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _emailCtrl,
                         focusNode: _emailFocus,
                         keyboardType: TextInputType.emailAddress,
-                        style: GoogleFonts.inter(fontSize: 15, color: _dark),
+                        style: GoogleFonts.inter(fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: _emailTouched ? _validateEmail : null,
                         onChanged: (_) => setState(() => _emailTouched = true),
@@ -435,6 +534,7 @@ class _LoginPageState extends State<LoginPage>
                             FocusScope.of(context).requestFocus(_passFocus),
                         textInputAction: TextInputAction.next,
                         decoration: _fieldDeco(
+                          context,
                           'name@example.com',
                           Icons.alternate_email_rounded,
                         ),
@@ -445,7 +545,7 @@ class _LoginPageState extends State<LoginPage>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _fieldLabel('Password'),
+                          _fieldLabel(context, 'Password'),
                           TextButton(
                             onPressed: _forgotPassword,
                             style: TextButton.styleFrom(
@@ -469,13 +569,14 @@ class _LoginPageState extends State<LoginPage>
                         controller: _passCtrl,
                         focusNode: _passFocus,
                         obscureText: !_showPass,
-                        style: GoogleFonts.inter(fontSize: 15, color: _dark),
+                        style: GoogleFonts.inter(fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: _passTouched ? _validatePassword : null,
                         onChanged: (_) => setState(() => _passTouched = true),
                         onFieldSubmitted: (_) => _login(),
                         textInputAction: TextInputAction.done,
                         decoration: _fieldDeco(
+                          context,
                           '••••••••',
                           Icons.lock_outline_rounded,
                           suffix: IconButton(
@@ -507,9 +608,25 @@ class _LoginPageState extends State<LoginPage>
                         width: double.infinity,
                         child: OutlinedButton.icon(
                           onPressed: _isLoading ? null : _sendEmailLink,
-                          icon: const Icon(Icons.link_rounded),
+                          icon: Icon(Icons.link_rounded),
                           label: Text(
                             'Email Me a Password-less Link',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton.icon(
+                          onPressed: _isLoading
+                              ? null
+                              : _completeEmailLinkManually,
+                          icon: Icon(Icons.mark_email_read_rounded),
+                          label: Text(
+                            'I already have a password-less link',
                             style: GoogleFonts.plusJakartaSans(
                               fontWeight: FontWeight.w800,
                             ),
@@ -544,6 +661,7 @@ class _LoginPageState extends State<LoginPage>
                         children: [
                           Expanded(
                             child: _buildBioButton(
+                              context,
                               Icons.fingerprint_rounded,
                               'Touch ID',
                             ),
@@ -551,6 +669,7 @@ class _LoginPageState extends State<LoginPage>
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildBioButton(
+                              context,
                               Icons.face_unlock_rounded,
                               'Face ID',
                             ),
@@ -569,7 +688,7 @@ class _LoginPageState extends State<LoginPage>
                                 Text(
                                   'New to FinEase? ',
                                   style: GoogleFonts.inter(
-                                    color: Colors.grey[600],
+                                    color: Theme.of(context).textTheme.bodyMedium?.color,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -615,30 +734,30 @@ class _LoginPageState extends State<LoginPage>
     decoration: BoxDecoration(shape: BoxShape.circle, color: color),
   );
 
-  Widget _fieldLabel(String text) => Text(
+  Widget _fieldLabel(BuildContext context, String text) => Text(
     text,
     style: GoogleFonts.plusJakartaSans(
       fontSize: 13,
       fontWeight: FontWeight.w700,
-      color: _dark,
+      color: Theme.of(context).colorScheme.onSurface,
     ),
   );
 
-  InputDecoration _fieldDeco(String hint, IconData icon, {Widget? suffix}) =>
+  InputDecoration _fieldDeco(BuildContext context, String hint, IconData icon, {Widget? suffix}) =>
       InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.inter(color: Colors.grey[400], fontSize: 14),
         prefixIcon: Icon(icon, color: Colors.grey[400], size: 20),
         suffixIcon: suffix,
         filled: true,
-        fillColor: const Color(0xFFF8F9FE),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -669,7 +788,7 @@ class _LoginPageState extends State<LoginPage>
       ),
       child: Row(
         children: [
-          const Icon(Icons.lock_rounded, color: _error, size: 20),
+          Icon(Icons.lock_rounded, color: _error, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -697,7 +816,7 @@ class _LoginPageState extends State<LoginPage>
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.warning_amber_rounded,
             color: Color(0xFFF97316),
             size: 16,
@@ -752,7 +871,7 @@ class _LoginPageState extends State<LoginPage>
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.lock_open_rounded,
                     color: Colors.white,
                     size: 18,
@@ -772,12 +891,12 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildBioButton(IconData icon, String label) {
+  Widget _buildBioButton(BuildContext context, IconData icon, String label) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
+        border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -793,14 +912,14 @@ class _LoginPageState extends State<LoginPage>
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              Icon(icon, color: _dark, size: 28),
+              Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 28),
               const SizedBox(height: 8),
               Text(
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: _dark,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],

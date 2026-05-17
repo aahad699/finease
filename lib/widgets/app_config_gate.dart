@@ -124,14 +124,14 @@ class AppBlockedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       appBar: Navigator.canPop(context)
           ? AppBar(
-              backgroundColor: AppTheme.background,
+              backgroundColor: AppTheme.backgroundFor(context),
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                color: AppTheme.textPrimary,
+                icon: Icon(Icons.arrow_back_ios_new_rounded),
+                color: AppTheme.textPrimaryFor(context),
                 onPressed: () => Navigator.pop(context),
               ),
             )
@@ -169,9 +169,9 @@ class AppBlockedView extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 520),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: AppTheme.borderFor(context)),
             boxShadow: AppTheme.softShadow,
           ),
           child: Column(
@@ -190,7 +190,7 @@ class AppBlockedView extends StatelessWidget {
                 title,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                 ),
@@ -200,7 +200,7 @@ class AppBlockedView extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   height: 1.5,
                 ),
               ),
@@ -232,13 +232,13 @@ class AppAnnouncementBanner extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       decoration: BoxDecoration(
         color: primaryColor,
-        border: Border(bottom: BorderSide(color: AppTheme.border)),
+        border: Border(bottom: BorderSide(color: AppTheme.borderFor(context))),
       ),
       child: SafeArea(
         bottom: false,
         child: Row(
           children: [
-            const Icon(Icons.campaign_rounded, color: Colors.white, size: 20),
+            Icon(Icons.campaign_rounded, color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Column(

@@ -51,6 +51,7 @@ dependencies:
   youtube_player_iframe: ^5.2.2
   shared_preferences: ^2.5.5
   firebase_data_connect: ^0.3.0+2
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:

@@ -27,9 +27,9 @@ class PartnerProductCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
           boxShadow: AppTheme.softShadow,
         ),
         child: Column(
@@ -58,7 +58,7 @@ class PartnerProductCard extends StatelessWidget {
                             child: Text(
                               partner.name,
                               style: GoogleFonts.plusJakartaSans(
-                                color: AppTheme.textPrimary,
+                                color: AppTheme.textPrimaryFor(context),
                                 fontWeight: FontWeight.w800,
                                 fontSize: 17,
                               ),
@@ -89,7 +89,7 @@ class PartnerProductCard extends StatelessWidget {
                       Text(
                         '${partner.category} - ${partner.rateLabel}',
                         style: GoogleFonts.inter(
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondaryFor(context),
                           fontSize: 12,
                         ),
                       ),
@@ -102,7 +102,7 @@ class PartnerProductCard extends StatelessWidget {
             Text(
               partner.description,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 height: 1.5,
               ),
             ),
@@ -117,7 +117,7 @@ class PartnerProductCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.verified_user_rounded,
                     size: 18,
                     color: AppTheme.success,
@@ -179,7 +179,7 @@ class PartnerProductCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppTheme.surfaceCardFor(context),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -188,7 +188,7 @@ class PartnerProductCard extends StatelessWidget {
                   Text(
                     'Estimated benefit',
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       fontSize: 12,
                     ),
                   ),
@@ -196,7 +196,7 @@ class PartnerProductCard extends StatelessWidget {
                   Text(
                     partner.estimatedBenefit,
                     style: GoogleFonts.plusJakartaSans(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -204,14 +204,14 @@ class PartnerProductCard extends StatelessWidget {
                   Text(
                     partner.eligibility.first,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       height: 1.45,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.warning_amber_rounded,
                         size: 16,
                         color: AppTheme.warning,
@@ -223,7 +223,7 @@ class PartnerProductCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondaryFor(context),
                             fontSize: 12,
                             height: 1.35,
                           ),
@@ -255,9 +255,9 @@ class PartnerProductCard extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: onCompareToggle,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.textPrimary,
+                      foregroundColor: AppTheme.textPrimaryFor(context),
                       side: BorderSide(
-                        color: isCompared ? AppTheme.primary : AppTheme.border,
+                        color: isCompared ? AppTheme.primary : AppTheme.borderFor(context),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
@@ -293,7 +293,7 @@ class _StatPill extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -304,7 +304,7 @@ class _StatPill extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 11,
             ),
           ),
@@ -314,7 +314,7 @@ class _StatPill extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w700,
               fontSize: 12,
             ),
@@ -335,14 +335,14 @@ class _TagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Text(
         label,
         style: GoogleFonts.inter(
-          color: AppTheme.textPrimary,
+          color: AppTheme.textPrimaryFor(context),
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),

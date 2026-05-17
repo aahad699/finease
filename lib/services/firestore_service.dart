@@ -23,6 +23,38 @@ class SavingsUsageRequiredException extends FinanceValidationException {
   final double requiredAmount;
 }
 
+class TransactionImpactPreview {
+  const TransactionImpactPreview({
+    required this.periodIncome,
+    required this.periodExpenses,
+    required this.projectedExpenses,
+    required this.periodBudget,
+    required this.categoryBudget,
+    required this.categorySpent,
+    required this.savingsBalance,
+    required this.budgetUsage,
+    required this.incomeUsage,
+    required this.healthScore,
+    required this.warnings,
+    required this.needsSavings,
+    required this.requiredSavings,
+  });
+
+  final double periodIncome;
+  final double periodExpenses;
+  final double projectedExpenses;
+  final double periodBudget;
+  final double categoryBudget;
+  final double categorySpent;
+  final double savingsBalance;
+  final double budgetUsage;
+  final double incomeUsage;
+  final int healthScore;
+  final List<String> warnings;
+  final bool needsSavings;
+  final double requiredSavings;
+}
+
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String uid;
@@ -57,6 +89,8 @@ class FirestoreService {
     final summaryRef = _monthlySummaryRef(_monthKey(transaction.date));
     final userRef = _db.collection('users').doc(uid);
     final txRef = userRef.collection('transactions').doc();
+    final transferRef = userRef.collection('transactions').doc();
+    final transferLogRef = userRef.collection('savings_transfers').doc();
 
     await _db.runTransaction((dbTransaction) async {
       final userSnap = await dbTransaction.get(userRef);
@@ -73,6 +107,30 @@ class FirestoreService {
       );
 
       dbTransaction.set(txRef, transaction.toMap());
+      if (updated.savingsWithdrawal > 0) {
+        final transferMap = FinancialTransaction(
+          id: '',
+          title: 'Savings transfer for ${transaction.title}',
+          amount: updated.savingsWithdrawal,
+          date: transaction.date,
+          category: 'Savings',
+          type: 'transfer',
+          note: 'Automatically moved from Savings to cover this expense.',
+          linkedBudgetCategory: categoryFromTransaction(transaction),
+          transferDirection: 'savings_to_spending',
+        ).toMap();
+        transferMap['linkedTransactionId'] = txRef.id;
+        dbTransaction.set(transferRef, transferMap);
+        dbTransaction.set(transferLogRef, {
+          'amount': updated.savingsWithdrawal,
+          'date': Timestamp.fromDate(transaction.date),
+          'direction': 'savings_to_spending',
+          'category': categoryFromTransaction(transaction),
+          'reason': transaction.title,
+          'linkedTransactionId': txRef.id,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
       dbTransaction.set(summaryRef, updated.summary, SetOptions(merge: true));
       dbTransaction.set(userRef, updated.profilePatch, SetOptions(merge: true));
     });
@@ -122,6 +180,96 @@ class FirestoreService {
     });
   }
 
+  Future<TransactionImpactPreview> previewTransactionImpact(
+    FinancialTransaction transaction,
+  ) async {
+    _validateTransaction(transaction);
+    final periodKey = _monthKey(transaction.date);
+    final transactions = await getTransactions().first;
+    final budgets = await getBudgetPlans(monthKey: periodKey).first;
+    final profile = await getUserProfile().first;
+    final monthly = transactions
+        .where((item) => _monthKey(item.date) == periodKey)
+        .toList();
+    final periodIncome = monthly
+        .where((item) => item.type == 'income')
+        .fold<double>(0, (total, item) => total + item.amount);
+    final periodExpenses = monthly
+        .where((item) => item.type == 'expense')
+        .fold<double>(0, (total, item) => total + item.amount);
+    final periodBudget = budgets.fold<double>(
+      0,
+      (total, budget) => total + budget.allocatedAmount,
+    );
+    final category = _normalizeCategory(transaction.category);
+    final categoryBudget = budgets
+        .where((budget) => budget.category == category)
+        .fold<double>(0, (total, budget) => total + budget.allocatedAmount);
+    final categorySpent = monthly
+        .where((item) => item.type == 'expense' && item.category == category)
+        .fold<double>(0, (total, item) => total + item.amount);
+    final projectedExpenses = transaction.type == 'expense'
+        ? periodExpenses + transaction.amount
+        : periodExpenses;
+    final projectedIncome = transaction.type == 'income'
+        ? periodIncome + transaction.amount
+        : periodIncome;
+    final budgetUsage = periodBudget <= 0
+        ? 0.0
+        : (projectedExpenses / periodBudget).clamp(0.0, 2.0);
+    final incomeUsage = projectedIncome <= 0
+        ? 0.0
+        : (projectedExpenses / projectedIncome).clamp(0.0, 2.0);
+    final availableSavings =
+        ((profile['savingsBalance'] ?? 0) as num).toDouble() +
+        ((profile['extraSavingsBalance'] ?? 0) as num).toDouble();
+    final requiredSavings = transaction.type == 'expense'
+        ? (projectedExpenses - projectedIncome)
+              .clamp(0, double.infinity)
+              .toDouble()
+        : 0.0;
+    final warnings = <String>[];
+    if (transaction.type == 'expense' &&
+        budgetUsage >= 0.85 &&
+        budgetUsage < 1) {
+      warnings.add(
+        'This expense puts the selected period close to budget limit.',
+      );
+    }
+    if (transaction.type == 'expense' && budgetUsage >= 1) {
+      warnings.add('This expense will exceed the selected period budget.');
+    }
+    if (transaction.type == 'expense' && projectedExpenses > projectedIncome) {
+      warnings.add('Total expenses will exceed income for this period.');
+    }
+    if (transaction.type == 'expense' &&
+        categoryBudget > 0 &&
+        categorySpent + transaction.amount > categoryBudget) {
+      warnings.add('$category is repeatedly moving past its budget.');
+    }
+    final healthScore = _healthScore(
+      income: projectedIncome,
+      expenses: projectedExpenses,
+      budget: periodBudget,
+      savings: availableSavings,
+    );
+    return TransactionImpactPreview(
+      periodIncome: projectedIncome,
+      periodExpenses: periodExpenses,
+      projectedExpenses: projectedExpenses,
+      periodBudget: periodBudget,
+      categoryBudget: categoryBudget,
+      categorySpent: categorySpent,
+      savingsBalance: availableSavings,
+      budgetUsage: budgetUsage,
+      incomeUsage: incomeUsage,
+      healthScore: healthScore,
+      warnings: warnings,
+      needsSavings: requiredSavings > 0,
+      requiredSavings: requiredSavings,
+    );
+  }
+
   Future<void> reconcileCurrentMonth() async {
     final key = _monthKey(DateTime.now());
     final transactions = await getTransactions().first;
@@ -166,7 +314,177 @@ class FirestoreService {
       if (monthKey == null || monthKey.isEmpty) {
         return budgets;
       }
-      return budgets.where((budget) => budget.monthKey == monthKey).toList();
+      return budgets
+          .where(
+            (budget) =>
+                budget.monthKey == monthKey || budget.periodKey == monthKey,
+          )
+          .toList();
+    });
+  }
+
+  Future<void> carryForwardBudgetLeftover({
+    required String periodType,
+    required String periodKey,
+    required DateTime periodEnd,
+  }) async {
+    if (DateTime.now().isBefore(periodEnd)) return;
+    final userRef = _db.collection('users').doc(uid);
+    final closureRef = userRef
+        .collection('budget_period_closures')
+        .doc(periodKey);
+    final budgets = await getBudgetPlans(monthKey: periodKey).first;
+    if (budgets.isEmpty) return;
+    final transactions = await getTransactions().first;
+    final periodExpenses = transactions
+        .where(
+          (transaction) =>
+              transaction.type == 'expense' &&
+              _periodKeyFor(transaction.date, periodType) == periodKey,
+        )
+        .fold<double>(0, (total, transaction) => total + transaction.amount);
+    final totalBudgeted = budgets.fold<double>(
+      0,
+      (total, budget) => total + budget.allocatedAmount,
+    );
+    final leftover = (totalBudgeted - periodExpenses)
+        .clamp(0, double.infinity)
+        .toDouble();
+    if (leftover <= 0) return;
+
+    final transferRef = userRef.collection('transactions').doc();
+    await _db.runTransaction((dbTransaction) async {
+      final closureSnap = await dbTransaction.get(closureRef);
+      if (closureSnap.exists) return;
+      final userSnap = await dbTransaction.get(userRef);
+      final profile = userSnap.data() ?? {};
+      final savingsBalance = ((profile['savingsBalance'] ?? 0) as num)
+          .toDouble();
+      final extraSavingsBalance = ((profile['extraSavingsBalance'] ?? 0) as num)
+          .toDouble();
+      final mainBalance = ((profile['mainBalance'] ?? 0) as num).toDouble();
+      final nextSavings = savingsBalance + leftover;
+      dbTransaction.set(closureRef, {
+        'periodType': periodType,
+        'periodKey': periodKey,
+        'leftover': leftover,
+        'closedAt': FieldValue.serverTimestamp(),
+      });
+      dbTransaction.set(transferRef, {
+        ...FinancialTransaction(
+          id: '',
+          title: 'Budget leftover moved to Savings',
+          amount: leftover,
+          date: periodEnd,
+          category: 'Savings',
+          type: 'transfer',
+          note: 'Automatic carry-forward from $periodType budget.',
+          linkedBudgetCategory: 'Savings',
+          transferDirection: 'budget_leftover_to_savings',
+        ).toMap(),
+        'periodType': periodType,
+        'periodKey': periodKey,
+      });
+      dbTransaction.set(userRef, {
+        'savingsBalance': nextSavings,
+        'extraSavingsBalance': extraSavingsBalance,
+        'totalBalance': mainBalance + nextSavings + extraSavingsBalance,
+        'lastFinancialUpdate': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    });
+  }
+
+  Future<double> previewBudgetLeftover({
+    required String periodType,
+    required String periodKey,
+  }) async {
+    final userRef = _db.collection('users').doc(uid);
+    final closureSnap = await userRef
+        .collection('budget_period_closures')
+        .doc(periodKey)
+        .get();
+    if (closureSnap.exists) return 0;
+    final budgets = await getBudgetPlans(monthKey: periodKey).first;
+    if (budgets.isEmpty) return 0;
+    final transactions = await getTransactions().first;
+    final periodExpenses = transactions
+        .where(
+          (transaction) =>
+              transaction.type == 'expense' &&
+              _periodKeyFor(transaction.date, periodType) == periodKey,
+        )
+        .fold<double>(0, (total, transaction) => total + transaction.amount);
+    final totalBudgeted = budgets.fold<double>(
+      0,
+      (total, budget) => total + budget.allocatedAmount,
+    );
+    return (totalBudgeted - periodExpenses)
+        .clamp(0, double.infinity)
+        .toDouble();
+  }
+
+  Future<void> pullSavingsForBudgetOverage({
+    required double amount,
+    required String periodType,
+    required String periodKey,
+    required String reason,
+  }) async {
+    if (!amount.isFinite || amount <= 0) {
+      throw FinanceValidationException(
+        'Savings transfer must be greater than zero.',
+      );
+    }
+    final userRef = _db.collection('users').doc(uid);
+    final transferRef = userRef.collection('transactions').doc();
+    final logRef = userRef.collection('savings_transfers').doc();
+    await _db.runTransaction((dbTransaction) async {
+      final userSnap = await dbTransaction.get(userRef);
+      final profile = userSnap.data() ?? {};
+      var savingsBalance = ((profile['savingsBalance'] ?? 0) as num).toDouble();
+      var extraSavingsBalance = ((profile['extraSavingsBalance'] ?? 0) as num)
+          .toDouble();
+      final availableSavings = savingsBalance + extraSavingsBalance;
+      if (amount > availableSavings) {
+        throw FinanceValidationException(
+          'Insufficient savings for this budget support transfer.',
+        );
+      }
+      final savingsDebit = amount.clamp(0, savingsBalance).toDouble();
+      savingsBalance -= savingsDebit;
+      extraSavingsBalance -= amount - savingsDebit;
+      final mainBalance =
+          ((profile['mainBalance'] ?? 0) as num).toDouble() + amount;
+      dbTransaction.set(transferRef, {
+        ...FinancialTransaction(
+          id: '',
+          title: 'Savings support for budget',
+          amount: amount,
+          date: DateTime.now(),
+          category: 'Savings',
+          type: 'transfer',
+          note: reason,
+          linkedBudgetCategory: 'Savings',
+          transferDirection: 'savings_to_budget',
+        ).toMap(),
+        'periodType': periodType,
+        'periodKey': periodKey,
+      });
+      dbTransaction.set(logRef, {
+        'amount': amount,
+        'date': FieldValue.serverTimestamp(),
+        'direction': 'savings_to_budget',
+        'periodType': periodType,
+        'periodKey': periodKey,
+        'reason': reason,
+        'linkedTransactionId': transferRef.id,
+      });
+      dbTransaction.set(userRef, {
+        'mainBalance': mainBalance,
+        'savingsBalance': savingsBalance,
+        'extraSavingsBalance': extraSavingsBalance,
+        'totalBalance': mainBalance + savingsBalance + extraSavingsBalance,
+        'lastFinancialUpdate': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     });
   }
 
@@ -334,19 +652,34 @@ class FirestoreService {
         );
   }
 
-  Future<void> addSavingGoal(SavingGoal goal) {
+  Future<void> addSavingGoal(SavingGoal goal) async {
+    await _validateSavingGoalFeasibility(goal);
     final map = goal.toMap();
     map['createdAt'] = FieldValue.serverTimestamp();
-    return _db.collection('users').doc(uid).collection('saving_goals').add(map);
+    await _db.collection('users').doc(uid).collection('saving_goals').add(map);
   }
 
-  Future<void> updateSavingGoal(String goalId, Map<String, dynamic> data) {
+  Future<void> updateSavingGoal(
+    String goalId,
+    Map<String, dynamic> data,
+  ) async {
+    final normalized = Map<String, dynamic>.from(data);
+    if (normalized['targetDate'] is DateTime) {
+      normalized['targetDate'] = Timestamp.fromDate(
+        normalized['targetDate'] as DateTime,
+      );
+    }
+    if (normalized['reminderDate'] is DateTime) {
+      normalized['reminderDate'] = Timestamp.fromDate(
+        normalized['reminderDate'] as DateTime,
+      );
+    }
     return _db
         .collection('users')
         .doc(uid)
         .collection('saving_goals')
         .doc(goalId)
-        .update(data);
+        .update(normalized);
   }
 
   Future<void> deleteSavingGoal(String goalId) {
@@ -359,6 +692,12 @@ class FirestoreService {
   }
 
   Future<void> addContribution(String goalId, double amount) async {
+    if (!amount.isFinite || amount <= 0) {
+      throw FinanceValidationException(
+        'Contribution must be greater than zero.',
+      );
+    }
+    await _validateSavingsAllocation(additionalAllocation: amount);
     final goalRef = _db
         .collection('users')
         .doc(uid)
@@ -368,13 +707,32 @@ class FirestoreService {
     if (!doc.exists) return;
     final current = (doc.data()?['currentAmount'] ?? 0.0).toDouble();
     final updated = current + amount;
+    final userRef = _db.collection('users').doc(uid);
+    final txRef = userRef.collection('transactions').doc();
 
-    await goalRef.update({'currentAmount': updated});
-
-    // Log the contribution
-    await goalRef.collection('contributions').add({
-      'amount': amount,
-      'date': FieldValue.serverTimestamp(),
+    await _db.runTransaction((dbTransaction) async {
+      dbTransaction.update(goalRef, {
+        'currentAmount': updated,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      dbTransaction.set(goalRef.collection('contributions').doc(), {
+        'amount': amount,
+        'date': FieldValue.serverTimestamp(),
+      });
+      dbTransaction.set(txRef, {
+        ...FinancialTransaction(
+          id: '',
+          title: 'Savings contribution',
+          amount: amount,
+          date: DateTime.now(),
+          category: 'Savings',
+          type: 'transfer',
+          note: 'Contribution allocated to ${doc.data()?['title'] ?? 'goal'}.',
+          linkedBudgetCategory: 'Savings',
+          transferDirection: 'savings_to_goal',
+        ).toMap(),
+        'linkedGoalId': goalId,
+      });
     });
   }
 
@@ -413,6 +771,61 @@ class FirestoreService {
             };
           }).toList(),
         );
+  }
+
+  Future<void> _validateSavingGoalFeasibility(SavingGoal goal) async {
+    if (goal.title.trim().isEmpty) {
+      throw FinanceValidationException('Journey title is required.');
+    }
+    if (!goal.targetAmount.isFinite || goal.targetAmount <= 0) {
+      throw FinanceValidationException(
+        'Target amount must be greater than zero.',
+      );
+    }
+    if (goal.currentAmount < 0 || goal.currentAmount > goal.targetAmount) {
+      throw FinanceValidationException(
+        'Current savings must stay between zero and the target amount.',
+      );
+    }
+    await _validateSavingsAllocation(additionalAllocation: goal.currentAmount);
+
+    final key = _monthKey(DateTime.now());
+    final summary = await getMonthlySummary(monthKey: key).first;
+    final profile = await getUserProfile().first;
+    final income =
+        ((summary['monthlyIncome'] ?? profile['monthlyIncome'] ?? 0) as num)
+            .toDouble();
+    final totalBudgeted = ((summary['totalBudgeted'] ?? 0) as num).toDouble();
+    final totalExpenses = ((summary['totalExpenses'] ?? 0) as num).toDouble();
+    final remainingBudget = (income - totalBudgeted - totalExpenses).clamp(
+      0,
+      double.infinity,
+    );
+    if (goal.monthlyTarget > remainingBudget && remainingBudget > 0) {
+      throw FinanceValidationException(
+        'This journey needs ${goal.monthlyTarget.toStringAsFixed(0)} per month, which is above the remaining budget. Adjust budget or choose a later date.',
+      );
+    }
+  }
+
+  Future<void> _validateSavingsAllocation({
+    required double additionalAllocation,
+  }) async {
+    final goals = await getSavingGoals().first;
+    final profile = await getUserProfile().first;
+    final availableSavings =
+        ((profile['savingsBalance'] ?? 0) as num).toDouble() +
+        ((profile['extraSavingsBalance'] ?? 0) as num).toDouble();
+    if (availableSavings <= 0) return;
+    final allocated = goals.fold<double>(
+      0,
+      (total, goal) => total + goal.currentAmount,
+    );
+    if (allocated + additionalAllocation > availableSavings) {
+      throw FinanceValidationException(
+        'Savings cannot be over-allocated. Add savings first or reduce goal allocation.',
+      );
+    }
   }
 
   // --------------- Course Progress ---------------
@@ -746,9 +1159,9 @@ class FirestoreService {
         'Transaction amount must be greater than zero.',
       );
     }
-    if (!['income', 'expense'].contains(transaction.type)) {
+    if (!['income', 'expense', 'transfer'].contains(transaction.type)) {
       throw FinanceValidationException(
-        'Transaction type must be income or expense.',
+        'Transaction type must be income, expense, or transfer.',
       );
     }
   }
@@ -774,6 +1187,27 @@ class FirestoreService {
 
   String _monthKey(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}';
+  }
+
+  String _periodKeyFor(DateTime date, String periodType) {
+    switch (periodType) {
+      case 'daily':
+        return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      case 'weekly':
+        final normalized = DateTime(date.year, date.month, date.day);
+        final firstDay = DateTime(date.year, 1, 1);
+        final offset = firstDay.weekday - DateTime.monday;
+        final firstMonday = firstDay.subtract(
+          Duration(days: offset < 0 ? 6 : offset),
+        );
+        final week = (normalized.difference(firstMonday).inDays ~/ 7) + 1;
+        return '${date.year}-W${week.toString().padLeft(2, '0')}';
+      case 'yearly':
+        return '${date.year}';
+      case 'monthly':
+      default:
+        return _monthKey(date);
+    }
   }
 
   Map<String, dynamic> _emptyMonthlySummary() {
@@ -899,7 +1333,7 @@ class FirestoreService {
       final delta = transaction.amount * sign;
       nextMonthlyIncome += delta;
       mainBalance += delta;
-    } else {
+    } else if (transaction.type == 'expense') {
       final delta = transaction.amount * sign;
       final spentSoFar = (categorySpent[category] ?? 0).toDouble();
       final categoryBudget = budgets
@@ -918,6 +1352,10 @@ class FirestoreService {
                 remainingCategoryBudget.clamp(0, transaction.amount).toDouble();
           }
         }
+        if (fromMain > mainBalance) {
+          fromSavings += fromMain - mainBalance;
+          fromMain = mainBalance;
+        }
         final availableSavings = savingsBalance + extraSavingsBalance;
         if (fromSavings > 0 && !allowSavingsWithdrawal) {
           throw SavingsUsageRequiredException(fromSavings);
@@ -933,6 +1371,7 @@ class FirestoreService {
           savingsBalance -= savingsDebit;
           extraSavingsBalance -= (fromSavings - savingsDebit);
         }
+        summary['_savingsWithdrawal'] = fromSavings;
       } else {
         mainBalance += transaction.amount;
       }
@@ -957,6 +1396,8 @@ class FirestoreService {
       'categorySpent': categorySpent,
       'updatedAt': FieldValue.serverTimestamp(),
     };
+    final savingsWithdrawal = (summary.remove('_savingsWithdrawal') ?? 0.0)
+        .toDouble();
 
     final profilePatch = {
       'monthlyIncome': nextSummary['monthlyIncome'],
@@ -967,7 +1408,38 @@ class FirestoreService {
       'lastFinancialUpdate': FieldValue.serverTimestamp(),
     };
 
-    return _FinanceUpdate(nextSummary, profilePatch);
+    return _FinanceUpdate(
+      nextSummary,
+      profilePatch,
+      savingsWithdrawal: savingsWithdrawal,
+    );
+  }
+
+  String categoryFromTransaction(FinancialTransaction transaction) {
+    return _normalizeCategory(transaction.category);
+  }
+
+  int _healthScore({
+    required double income,
+    required double expenses,
+    required double budget,
+    required double savings,
+  }) {
+    var score = 100;
+    if (income > 0) {
+      score -= ((expenses / income).clamp(0.0, 1.4) * 35).round();
+    } else if (expenses > 0) {
+      score -= 35;
+    }
+    if (budget > 0) {
+      score -= ((expenses / budget).clamp(0.0, 1.4) * 25).round();
+    }
+    if (savings <= 0) {
+      score -= 15;
+    } else if (income > 0 && savings < income * 0.1) {
+      score -= 8;
+    }
+    return score.clamp(0, 100);
   }
 
   String _normalizeCategory(String category) {
@@ -986,8 +1458,9 @@ class FirestoreService {
 }
 
 class _FinanceUpdate {
-  _FinanceUpdate(this.summary, this.profilePatch);
+  _FinanceUpdate(this.summary, this.profilePatch, {this.savingsWithdrawal = 0});
 
   final Map<String, dynamic> summary;
   final Map<String, dynamic> profilePatch;
+  final double savingsWithdrawal;
 }

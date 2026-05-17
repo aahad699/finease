@@ -11,6 +11,10 @@ class BudgetPlan {
     required this.createdAt,
     this.allocationPercent,
     this.allocationMode = 'manual',
+    this.periodType = 'monthly',
+    this.periodKey,
+    this.isDebtPayment = false,
+    this.reminderDate,
   });
 
   final String id;
@@ -22,6 +26,10 @@ class BudgetPlan {
   final DateTime? createdAt;
   final double? allocationPercent;
   final String allocationMode;
+  final String periodType;
+  final String? periodKey;
+  final bool isDebtPayment;
+  final DateTime? reminderDate;
 
   factory BudgetPlan.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -35,18 +43,30 @@ class BudgetPlan {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       allocationPercent: (data['allocationPercent'] as num?)?.toDouble(),
       allocationMode: data['allocationMode'] ?? 'manual',
+      periodType: data['periodType'] ?? 'monthly',
+      periodKey: data['periodKey'] ?? data['monthKey'],
+      isDebtPayment: data['isDebtPayment'] ?? false,
+      reminderDate: (data['reminderDate'] as Timestamp?)?.toDate(),
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    final resolvedPeriodKey = periodKey ?? monthKey;
+    final map = {
       'title': title,
       'category': category,
       'allocatedAmount': allocatedAmount,
       'notes': notes,
       'monthKey': monthKey,
+      'periodKey': resolvedPeriodKey,
+      'periodType': periodType,
       'allocationPercent': allocationPercent,
       'allocationMode': allocationMode,
+      'isDebtPayment': isDebtPayment,
     };
+    if (reminderDate != null) {
+      map['reminderDate'] = Timestamp.fromDate(reminderDate!);
+    }
+    return map;
   }
 }

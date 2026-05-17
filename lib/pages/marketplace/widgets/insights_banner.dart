@@ -21,9 +21,9 @@ class MarketplaceInsightsBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -37,7 +37,7 @@ class MarketplaceInsightsBanner extends StatelessWidget {
                   color: AppTheme.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.verified_user_rounded,
                   color: AppTheme.primary,
                 ),
@@ -47,7 +47,7 @@ class MarketplaceInsightsBanner extends StatelessWidget {
                 child: Text(
                   'FinEase trust layer keeps verification, safety signals, and structured product context visible before handoff.',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.45,
                   ),
                 ),
@@ -95,7 +95,7 @@ class _InsightMetric extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -104,7 +104,7 @@ class _InsightMetric extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
             ),
           ),
@@ -112,7 +112,7 @@ class _InsightMetric extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w800,
             ),
           ),

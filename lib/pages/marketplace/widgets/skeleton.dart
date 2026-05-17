@@ -14,9 +14,9 @@ class MarketplaceSkeleton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surfaceFor(context),
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: AppTheme.borderFor(context)),
             ),
             child: const Column(
               children: [
@@ -40,9 +40,9 @@ class MarketplaceSkeleton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surfaceFor(context),
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: AppTheme.borderFor(context)),
             ),
             child: const Column(
               children: [

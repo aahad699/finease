@@ -198,7 +198,7 @@ class _SignupPageState extends State<SignupPage>
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline_rounded,
               color: Colors.white,
               size: 18,
@@ -218,7 +218,7 @@ class _SignupPageState extends State<SignupPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background decorative circles
@@ -250,7 +250,7 @@ class _SignupPageState extends State<SignupPage>
                         onPressed: () => Navigator.pop(context),
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: _dark,
+                          color: Theme.of(context).colorScheme.onSurface,
                           size: 20,
                         ),
                       ),
@@ -280,11 +280,9 @@ class _SignupPageState extends State<SignupPage>
                           children: [
                             // Logo
                             Container(
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF1BFFFF), _primary],
-                                ),
+                                color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(18),
                                 boxShadow: [
                                   BoxShadow(
@@ -294,10 +292,11 @@ class _SignupPageState extends State<SignupPage>
                                   ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.person_add_rounded,
-                                color: Colors.white,
-                                size: 32,
+                              child: Image.asset(
+                                'assets/logo/logo.png',
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.contain,
                               ),
                             ),
                             const SizedBox(height: 28),
@@ -306,7 +305,7 @@ class _SignupPageState extends State<SignupPage>
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w800,
-                                color: _dark,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 letterSpacing: -1,
                               ),
                             ),
@@ -315,16 +314,17 @@ class _SignupPageState extends State<SignupPage>
                               'Secure your financial future with FinEase.',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: Theme.of(context).textTheme.bodyMedium?.color,
                                 height: 1.5,
                               ),
                             ),
                             const SizedBox(height: 32),
 
                             // ── Full Name ──
-                            _fieldLabel('Full Name'),
+                            _fieldLabel(context, 'Full Name'),
                             const SizedBox(height: 8),
                             _buildField(
+                              context: context,
                               controller: _nameCtrl,
                               focusNode: _nameFocus,
                               hint: 'e.g. Abdullah Khaleeq',
@@ -338,9 +338,10 @@ class _SignupPageState extends State<SignupPage>
                             const SizedBox(height: 20),
 
                             // ── Email ──
-                            _fieldLabel('Email Address'),
+                            _fieldLabel(context, 'Email Address'),
                             const SizedBox(height: 8),
                             _buildField(
+                              context: context,
                               controller: _emailCtrl,
                               focusNode: _emailFocus,
                               hint: 'name@example.com',
@@ -356,9 +357,10 @@ class _SignupPageState extends State<SignupPage>
                             const SizedBox(height: 20),
 
                             // ── Password ──
-                            _fieldLabel('Password'),
+                            _fieldLabel(context, 'Password'),
                             const SizedBox(height: 8),
                             _buildField(
+                              context: context,
                               controller: _passCtrl,
                               focusNode: _passFocus,
                               hint: 'Min 8 chars, A-Z, 0-9, !@#',
@@ -390,9 +392,10 @@ class _SignupPageState extends State<SignupPage>
                             const SizedBox(height: 20),
 
                             // ── Confirm Password ──
-                            _fieldLabel('Confirm Password'),
+                            _fieldLabel(context, 'Confirm Password'),
                             const SizedBox(height: 8),
                             _buildField(
+                              context: context,
                               controller: _confirmPassCtrl,
                               focusNode: _confirmFocus,
                               hint: 'Re-enter your password',
@@ -470,16 +473,17 @@ class _SignupPageState extends State<SignupPage>
     decoration: BoxDecoration(shape: BoxShape.circle, color: color),
   );
 
-  Widget _fieldLabel(String text) => Text(
+  Widget _fieldLabel(BuildContext context, String text) => Text(
     text,
     style: GoogleFonts.plusJakartaSans(
       fontSize: 13,
       fontWeight: FontWeight.w700,
-      color: _dark,
+      color: Theme.of(context).colorScheme.onSurface,
     ),
   );
 
   Widget _buildField({
+    required BuildContext context,
     required TextEditingController controller,
     required FocusNode focusNode,
     required String hint,
@@ -500,7 +504,10 @@ class _SignupPageState extends State<SignupPage>
       obscureText: isPassword && !showPass,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
-      style: GoogleFonts.inter(fontSize: 15, color: _dark),
+      style: GoogleFonts.inter(
+        fontSize: 15,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: validator,
       onChanged: onChanged,
@@ -522,17 +529,17 @@ class _SignupPageState extends State<SignupPage>
                 onPressed: onToggle,
               )
             : suffixCheckmark
-            ? const Icon(Icons.check_circle_rounded, color: _success, size: 20)
+            ? Icon(Icons.check_circle_rounded, color: _success, size: 20)
             : null,
         filled: true,
-        fillColor: const Color(0xFFF8F9FE),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -686,7 +693,7 @@ class _SignupPageState extends State<SignupPage>
               borderRadius: BorderRadius.circular(6),
             ),
             child: _acceptedTerms
-                ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                ? Icon(Icons.check_rounded, color: Colors.white, size: 14)
                 : null,
           ),
           const SizedBox(width: 12),

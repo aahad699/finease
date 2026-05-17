@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../services/auth_service.dart';
+import '../../services/theme_service.dart';
+import '../../theme/app_theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -9,62 +13,26 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-  // bool _pushAlerts = true;
-  // bool _monthlyReports = true;
-  bool _biometric = false;
-  // bool _darkTheme = false;
-  // String _language = 'English (US)';
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    if (_uid.isEmpty) return;
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(_uid)
-        .get();
-    if (doc.exists) {
-      final d = doc.data()!;
-      setState(() {
-        // _pushAlerts = d['pushAlerts'] ?? true;
-        // _monthlyReports = d['monthlyReports'] ?? true;
-        _biometric = d['biometricLogin'] ?? false;
-        // _darkTheme = d['darkTheme'] ?? false;
-        // _language = d['language'] ?? 'English (US)';
-      });
-    }
-  }
-
-  Future<void> _save(String key, dynamic val) async {
-    if (_uid.isEmpty) return;
-    await FirebaseFirestore.instance.collection('users').doc(_uid).set({
-      key: val,
-    }, SetOptions(merge: true));
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final name = user?.displayName ?? 'Alex Rivera';
+    final authService = context.watch<AuthService>();
+    final themeService = context.watch<ThemeService>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 160,
             pinned: true,
-            backgroundColor: const Color(0xFF15157D),
+            backgroundColor: AppTheme.primary,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF15157D), Color(0xFF2E3192)],
+                    colors: [AppTheme.primary, AppTheme.secondary],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -81,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? NetworkImage(user!.photoURL!)
                               : null,
                           child: user?.photoURL == null
-                              ? const Icon(
+                              ? Icon(
                                   Icons.person_rounded,
                                   size: 36,
                                   color: Colors.white,
@@ -126,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               // child: const Text(
                               //   'Pro Member',
                               //   style: TextStyle(
-                              //     color: Color(0xFF00F2EA),
+                              //     color: AppTheme.secondary,
                               //     fontWeight: FontWeight.bold,
                               //     fontSize: 11,
                               //     fontFamily: 'Inter',
@@ -160,13 +128,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Icons.fingerprint_rounded,
                     'Biometric Login',
                     trailing: Switch(
-                      value: _biometric,
-                      onChanged: (v) {
-                        setState(() => _biometric = v);
-                        _save('biometricLogin', v);
+                      value: authService.isBiometricEnabled,
+                      onChanged: (v) async {
+                        if (v) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Sign in again from the login screen to enable biometric unlock.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        await authService.disableBiometricLogin();
+                        if (!context.mounted) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Biometric login disabled.'),
+                          ),
+                        );
                       },
-                      activeThumbColor: const Color(0xFF00F2EA),
+                      activeThumbColor: AppTheme.secondary,
                     ),
+                  ),
+                  _tile(
+                    themeService.isDarkMode
+                        ? Icons.dark_mode_rounded
+                        : Icons.light_mode_rounded,
+                    'Appearance',
+                    subtitle: themeService.isDarkMode
+                        ? 'Dark mode is active'
+                        : 'Light mode is active',
+                    trailing: _ThemeModeSwitch(themeService: themeService),
                   ),
 
                   // _tile(
@@ -187,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //       setState(() => _pushAlerts = v);
                   //       _save('pushAlerts', v);
                   //     },
-                  //     activeThumbColor: const Color(0xFF00F2EA),
+                  //     activeThumbColor: AppTheme.secondary,
                   //   ),
                   // ),
                   // _tile(
@@ -200,7 +195,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //       setState(() => _monthlyReports = v);
                   //       _save('monthlyReports', v);
                   //     },
-                  //     activeThumbColor: const Color(0xFF00F2EA),
+                  //     activeThumbColor: AppTheme.secondary,
                   //   ),
                   // ),
                   const SizedBox(height: 20),
@@ -209,7 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //   Icons.language_rounded,
                   //   _language,
                   //   subtitle: 'App display language',
-                  //   trailing: const Icon(
+                  //   trailing: Icon(
                   //     Icons.chevron_right_rounded,
                   //     color: Color(0xFFC7C5D4),
                   //   ),
@@ -226,7 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //       setState(() => _darkTheme = v);
                   //       _save('darkTheme', v);
                   //     },
-                  //     activeThumbColor: const Color(0xFF00F2EA),
+                  //     activeThumbColor: AppTheme.secondary,
                   //   ),
                   // ),
                   const SizedBox(height: 20),
@@ -294,7 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFE5EEFF),
-                        foregroundColor: const Color(0xFF2E3192),
+                        foregroundColor: AppTheme.primary,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -303,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       onPressed: () async =>
                           await FirebaseAuth.instance.signOut(),
-                      icon: const Icon(Icons.logout_rounded),
+                      icon: Icon(Icons.logout_rounded),
                       label: const Text(
                         'Sign Out',
                         style: TextStyle(
@@ -328,10 +323,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF0B1C30),
+          color: Theme.of(context).colorScheme.onSurface,
           fontFamily: 'Plus Jakarta Sans',
         ),
       ),
@@ -348,9 +343,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: ListTile(
         leading: Container(
@@ -359,21 +354,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: const Color(0xFFE5EEFF),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: const Color(0xFF2E3192), size: 20),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w500,
             fontFamily: 'Inter',
             fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         subtitle: subtitle != null
             ? Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Color(0xFF777683),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                   fontSize: 11,
                   fontFamily: 'Inter',
                 ),
@@ -381,7 +381,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             : null,
         trailing:
             trailing ??
-            const Icon(Icons.chevron_right_rounded, color: Color(0xFFC7C5D4)),
+            Icon(Icons.chevron_right_rounded, color: Color(0xFFC7C5D4)),
         onTap: onTap ?? () {},
       ),
     );
@@ -403,13 +403,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (_) => StatefulBuilder(
         builder: (ctx, setDialogState) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             title: const Row(
               children: [
-                Icon(Icons.lock_outline_rounded, color: Color(0xFF2E3192)),
+                Icon(Icons.lock_outline_rounded, color: AppTheme.primary),
                 SizedBox(width: 10),
-                Text('Change Password',
-                    style: TextStyle(fontFamily: 'Plus Jakarta Sans', fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  'Change Password',
+                  style: TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
             content: Form(
@@ -423,14 +431,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       obscureText: obscureCurrent,
                       decoration: InputDecoration(
                         labelText: 'Current Password',
-                        prefixIcon: const Icon(Icons.lock_rounded, size: 20),
+                        prefixIcon: Icon(Icons.lock_rounded, size: 20),
                         suffixIcon: IconButton(
-                          icon: Icon(obscureCurrent ? Icons.visibility_off : Icons.visibility, size: 20),
-                          onPressed: () => setDialogState(() => obscureCurrent = !obscureCurrent),
+                          icon: Icon(
+                            obscureCurrent
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            size: 20,
+                          ),
+                          onPressed: () => setDialogState(
+                            () => obscureCurrent = !obscureCurrent,
+                          ),
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? 'Required' : null,
                     ),
                     const SizedBox(height: 14),
                     TextFormField(
@@ -438,12 +456,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       obscureText: obscureNew,
                       decoration: InputDecoration(
                         labelText: 'New Password',
-                        prefixIcon: const Icon(Icons.lock_open_rounded, size: 20),
-                        suffixIcon: IconButton(
-                          icon: Icon(obscureNew ? Icons.visibility_off : Icons.visibility, size: 20),
-                          onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                        prefixIcon: Icon(
+                          Icons.lock_open_rounded,
+                          size: 20,
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureNew
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            size: 20,
+                          ),
+                          onPressed: () =>
+                              setDialogState(() => obscureNew = !obscureNew),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) return 'Required';
@@ -457,15 +486,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       obscureText: obscureConfirm,
                       decoration: InputDecoration(
                         labelText: 'Confirm New Password',
-                        prefixIcon: const Icon(Icons.check_circle_outline, size: 20),
-                        suffixIcon: IconButton(
-                          icon: Icon(obscureConfirm ? Icons.visibility_off : Icons.visibility, size: 20),
-                          onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                        prefixIcon: Icon(
+                          Icons.check_circle_outline,
+                          size: 20,
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureConfirm
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            size: 20,
+                          ),
+                          onPressed: () => setDialogState(
+                            () => obscureConfirm = !obscureConfirm,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       validator: (v) {
-                        if (v != newPwCtrl.text) return 'Passwords do not match';
+                        if (v != newPwCtrl.text) {
+                          return 'Passwords do not match';
+                        }
                         return null;
                       },
                     ),
@@ -480,8 +523,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2E3192),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: AppTheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: loading
                     ? null
@@ -510,7 +555,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (ctx.mounted) {
                             ScaffoldMessenger.of(ctx).showSnackBar(
                               SnackBar(
-                                content: Text(e.message ?? 'Failed to update password'),
+                                content: Text(
+                                  e.message ?? 'Failed to update password',
+                                ),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -518,8 +565,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }
                       },
                 child: loading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('Update', style: TextStyle(color: Colors.white)),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Update',
+                        style: TextStyle(color: Colors.white),
+                      ),
               ),
             ],
           );
@@ -553,6 +610,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ThemeModeSwitch extends StatelessWidget {
+  const _ThemeModeSwitch({required this.themeService});
+
+  final ThemeService themeService;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ThemeChip(
+            label: 'Light',
+            icon: Icons.light_mode_rounded,
+            selected: !themeService.isDarkMode,
+            onTap: () => themeService.setDarkMode(false),
+          ),
+          _ThemeChip(
+            label: 'Dark',
+            icon: Icons.dark_mode_rounded,
+            selected: themeService.isDarkMode,
+            onTap: () => themeService.setDarkMode(true),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ThemeChip extends StatelessWidget {
+  const _ThemeChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: selected ? colorScheme.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: selected ? colorScheme.onPrimary : colorScheme.primary,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? colorScheme.onPrimary : colorScheme.primary,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

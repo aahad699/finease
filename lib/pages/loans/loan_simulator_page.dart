@@ -63,15 +63,15 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       appBar: AppBar(
-        backgroundColor: AppTheme.background,
+        backgroundColor: AppTheme.backgroundFor(context),
         automaticallyImplyLeading: !widget.embedded,
         leading: widget.embedded
             ? null
             : IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-                color: Colors.black,
+                icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                color: Colors.white,
                 onPressed: () => Navigator.pop(context),
               ),
         title: Text(
@@ -169,7 +169,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -212,7 +212,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -220,7 +220,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                     'Principal vs interest through the repayment timeline',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -246,7 +246,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                                       labels[value.toInt()],
                                       style: GoogleFonts.inter(
                                         fontSize: 10,
-                                        color: AppTheme.textSecondary,
+                                        color: AppTheme.textSecondaryFor(context),
                                       ),
                                     ),
                                   );
@@ -301,7 +301,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Icon(Icons.auto_awesome_rounded, size: 18),
+                    : Icon(Icons.auto_awesome_rounded, size: 18),
                 label: Text(
                   _aiLoading ? 'Analyzing...' : 'Get AI Analysis',
                   style: GoogleFonts.inter(
@@ -319,7 +319,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                   children: [
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.auto_awesome_rounded,
                           color: AppTheme.primary,
                           size: 18,
@@ -340,7 +340,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                       _aiInsight!,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         height: 1.7,
                       ),
                     ),
@@ -358,7 +358,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -459,7 +459,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textSecondary),
+          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textSecondaryFor(context)),
         ),
       ],
     );
@@ -475,7 +475,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       decoration: BoxDecoration(
-        border: first ? null : Border(top: BorderSide(color: AppTheme.divider)),
+        border: first ? null : Border(top: BorderSide(color: AppTheme.borderFor(context))),
         color: highlight ? AppTheme.primary.withValues(alpha: 0.06) : null,
       ),
       child: Row(
@@ -485,7 +485,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
             label,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontWeight: highlight ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
@@ -494,7 +494,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: highlight ? AppTheme.primary : AppTheme.textPrimary,
+              color: highlight ? AppTheme.primary : AppTheme.textPrimaryFor(context),
             ),
           ),
         ],
@@ -515,7 +515,7 @@ class _LoanSimulatorPageState extends State<LoanSimulatorPage> {
           Text(
             label,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
             ),
           ),
@@ -543,9 +543,9 @@ class _SimCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: child,
@@ -583,7 +583,7 @@ class _Slider extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
               ),
             ),
             Text(
@@ -599,7 +599,7 @@ class _Slider extends StatelessWidget {
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: AppTheme.primary,
-            inactiveTrackColor: AppTheme.border,
+            inactiveTrackColor: AppTheme.borderFor(context),
             thumbColor: Colors.white,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             overlayColor: AppTheme.primary.withValues(alpha: 0.1),

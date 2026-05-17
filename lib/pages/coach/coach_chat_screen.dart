@@ -6,6 +6,7 @@ import '../../models/saving_goal.dart';
 import '../../models/transaction.dart';
 import '../../services/ai_service.dart';
 import '../../services/financial_coach_service.dart';
+import '../../theme/app_theme.dart';
 
 class CoachChatScreen extends StatefulWidget {
   const CoachChatScreen({
@@ -132,6 +133,7 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundFor(context),
       appBar: AppBar(
         title: Text(
           'AI Finance Coach',
@@ -183,14 +185,19 @@ class _ChatBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: message.isBot
-              ? const Color(0xFFF0F0F0)
+              ? AppTheme.surfaceFor(context)
               : _CoachChatScreenState._primary,
+          border: message.isBot
+              ? Border.all(color: AppTheme.borderFor(context))
+              : null,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
           message.text,
           style: GoogleFonts.inter(
-            color: message.isBot ? Colors.black87 : Colors.white,
+            color: message.isBot
+                ? AppTheme.textPrimaryFor(context)
+                : Colors.white,
             fontSize: 14,
             height: 1.4,
           ),
@@ -231,8 +238,8 @@ class _InputArea extends StatelessWidget {
         12 + MediaQuery.of(context).viewInsets.bottom,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: AppTheme.surfaceFor(context),
+        border: Border(top: BorderSide(color: AppTheme.borderFor(context))),
       ),
       child: Row(
         children: [
@@ -252,7 +259,7 @@ class _InputArea extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton.filled(
             onPressed: onSend,
-            icon: const Icon(Icons.send_rounded),
+            icon: Icon(Icons.send_rounded),
             style: IconButton.styleFrom(
               backgroundColor: _CoachChatScreenState._primary,
             ),

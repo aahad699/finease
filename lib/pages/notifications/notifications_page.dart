@@ -46,7 +46,7 @@ class NotificationsPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       appBar: AppBar(
         title: Text(
           'Notifications',
@@ -55,9 +55,9 @@ class NotificationsPage extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        backgroundColor: AppTheme.background,
+        backgroundColor: AppTheme.backgroundFor(context),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
@@ -103,9 +103,9 @@ class _NotifCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Row(
@@ -132,14 +132,14 @@ class _NotifCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     Text(
                       data.time,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                       ),
                     ),
                   ],
@@ -149,7 +149,7 @@ class _NotifCard extends StatelessWidget {
                   data.message,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.4,
                   ),
                 ),

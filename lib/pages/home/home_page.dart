@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/app_config.dart';
+import '../../models/budget_plan.dart';
 import '../../models/saving_goal.dart';
 import '../../models/transaction.dart';
 import '../../services/auth_service.dart';
@@ -60,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
@@ -143,6 +145,40 @@ class _HomePageState extends State<HomePage> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
                 sliver: SliverToBoxAdapter(
+                  child: firestoreService == null
+                      ? const SizedBox.shrink()
+                      : _HomeIntelligenceDashboard(
+                          firestoreService: firestoreService,
+                          onAddTransaction: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddTransactionPage(),
+                            ),
+                          ),
+                          onCreateBudget: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AIBudgetAdvisorPage(),
+                            ),
+                          ),
+                          onNewGoal: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SavingsTrackerPage(),
+                            ),
+                          ),
+                          onViewTransactions: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllTransactionsPage(),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                sliver: SliverToBoxAdapter(
                   child: _SectionHeader(
                     title: 'Core Tools',
                     actionLabel: 'Open Budget Planer',
@@ -163,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                       _FeatureItem(
                         label: 'Marketplace',
                         icon: Icons.storefront_rounded,
-                        color: const Color(0xFF2E3192),
+                        color: AppTheme.primary,
                         background: const Color(0xFFEEF2FF),
                         enabled: appConfig.marketplaceEnabled,
                         onTap: () => _openFeature(
@@ -403,7 +439,7 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => const AddTransactionPage()),
           ),
           backgroundColor: AppTheme.primary,
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
+          icon: Icon(Icons.add_rounded, color: Colors.white),
           label: Text(
             'Add Transaction',
             style: GoogleFonts.plusJakartaSans(
@@ -448,6 +484,941 @@ class _HomePageState extends State<HomePage> {
     }
 
     Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  }
+}
+
+class _HomeIntelligenceDashboard extends StatelessWidget {
+  const _HomeIntelligenceDashboard({
+    required this.firestoreService,
+    required this.onAddTransaction,
+    required this.onCreateBudget,
+    required this.onNewGoal,
+    required this.onViewTransactions,
+  });
+
+  final dynamic firestoreService;
+  final VoidCallback onAddTransaction;
+  final VoidCallback onCreateBudget;
+  final VoidCallback onNewGoal;
+  final VoidCallback onViewTransactions;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final monthKey = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+    return StreamBuilder<List<FinancialTransaction>>(
+      stream: firestoreService.getTransactions(),
+      builder: (context, txnSnapshot) {
+        final transactions = txnSnapshot.data ?? const <FinancialTransaction>[];
+        return StreamBuilder<List<SavingGoal>>(
+          stream: firestoreService.getSavingGoals(),
+          builder: (context, goalSnapshot) {
+            final goals = goalSnapshot.data ?? const <SavingGoal>[];
+            return StreamBuilder<List<BudgetPlan>>(
+              stream: firestoreService.getBudgetPlans(monthKey: monthKey),
+              builder: (context, budgetSnapshot) {
+                final budgets = budgetSnapshot.data ?? const <BudgetPlan>[];
+                return StreamBuilder<Map<String, dynamic>>(
+                  stream: firestoreService.getUserProfile(),
+                  builder: (context, profileSnapshot) {
+                    final profile = profileSnapshot.data ?? const {};
+                    final analytics = _HomeDashboardAnalytics.from(
+                      transactions: transactions,
+                      goals: goals,
+                      budgets: budgets,
+                      profile: profile,
+                    );
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _DashboardTitle(periodLabel: analytics.periodLabel),
+                        const SizedBox(height: 14),
+                        _HealthScoreHero(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _QuickActionDeck(
+                          onAddTransaction: onAddTransaction,
+                          onCreateBudget: onCreateBudget,
+                          onNewGoal: onNewGoal,
+                          onViewTransactions: onViewTransactions,
+                        ),
+                        const SizedBox(height: 14),
+                        _BudgetOverviewCard(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _IncomeExpenseCard(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _SavingsJourneysCard(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _ReminderDeadlineCard(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _WeeklyNarrativeCard(analytics: analytics),
+                        const SizedBox(height: 14),
+                        _RecentActivityStrip(
+                          transactions: analytics.recentTransactions,
+                          onViewAll: onViewTransactions,
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _HomeDashboardAnalytics {
+  const _HomeDashboardAnalytics({
+    required this.transactions,
+    required this.goals,
+    required this.budgets,
+    required this.monthlyIncome,
+    required this.monthlyExpenses,
+    required this.totalBudgeted,
+    required this.totalSaved,
+    required this.totalTarget,
+    required this.profileSavings,
+  });
+
+  final List<FinancialTransaction> transactions;
+  final List<SavingGoal> goals;
+  final List<BudgetPlan> budgets;
+  final double monthlyIncome;
+  final double monthlyExpenses;
+  final double totalBudgeted;
+  final double totalSaved;
+  final double totalTarget;
+  final double profileSavings;
+
+  factory _HomeDashboardAnalytics.from({
+    required List<FinancialTransaction> transactions,
+    required List<SavingGoal> goals,
+    required List<BudgetPlan> budgets,
+    required Map<String, dynamic> profile,
+  }) {
+    final now = DateTime.now();
+    final monthlyTransactions = transactions
+        .where(
+          (txn) => txn.date.year == now.year && txn.date.month == now.month,
+        )
+        .toList();
+    final income = monthlyTransactions
+        .where((txn) => txn.type == 'income')
+        .fold<double>(0, (total, txn) => total + txn.amount);
+    final expenses = monthlyTransactions
+        .where((txn) => txn.type == 'expense')
+        .fold<double>(0, (total, txn) => total + txn.amount);
+    final profileIncome = ((profile['monthlyIncome'] ?? 0) as num).toDouble();
+    return _HomeDashboardAnalytics(
+      transactions: transactions,
+      goals: goals,
+      budgets: budgets,
+      monthlyIncome: income > 0 ? income : profileIncome,
+      monthlyExpenses: expenses,
+      totalBudgeted: budgets.fold<double>(
+        0,
+        (total, budget) => total + budget.allocatedAmount,
+      ),
+      totalSaved: goals.fold<double>(
+        0,
+        (total, goal) => total + goal.currentAmount,
+      ),
+      totalTarget: goals.fold<double>(
+        0,
+        (total, goal) => total + goal.targetAmount,
+      ),
+      profileSavings:
+          ((profile['savingsBalance'] ?? 0) as num).toDouble() +
+          ((profile['extraSavingsBalance'] ?? 0) as num).toDouble(),
+    );
+  }
+
+  String get periodLabel => DateFormat('MMMM yyyy').format(DateTime.now());
+  double get budgetProgress =>
+      totalBudgeted <= 0 ? 0 : (monthlyExpenses / totalBudgeted).clamp(0, 1);
+  double get incomeProgress =>
+      monthlyIncome <= 0 ? 0 : (monthlyExpenses / monthlyIncome).clamp(0, 1);
+  double get remainingBudget =>
+      (totalBudgeted - monthlyExpenses).clamp(0, double.infinity).toDouble();
+  double get remainingIncome =>
+      (monthlyIncome - monthlyExpenses).clamp(0, double.infinity).toDouble();
+  bool get overBudget => monthlyExpenses > totalBudgeted && totalBudgeted > 0;
+  bool get overIncome => monthlyExpenses > monthlyIncome && monthlyIncome > 0;
+  double get journeyProgress =>
+      totalTarget <= 0 ? 0 : (totalSaved / totalTarget).clamp(0, 1);
+  int get activeJourneys => goals.where((goal) => goal.remaining > 0).length;
+  int get debtItems =>
+      goals.where((goal) => goal.isDebtGoal).length +
+      budgets.where((budget) => budget.isDebtPayment).length;
+  List<FinancialTransaction> get recentTransactions =>
+      transactions.take(3).toList();
+  List<_ReminderItem> get reminders {
+    final now = DateTime.now();
+    final items = <_ReminderItem>[
+      ...transactions
+          .where((txn) => txn.deadline != null)
+          .map(
+            (txn) => _ReminderItem(
+              title: txn.title,
+              date: txn.deadline!,
+              type: txn.category,
+              urgent: txn.deadline!.difference(now).inDays <= 3,
+            ),
+          ),
+      ...goals
+          .where((goal) => goal.reminderDate != null)
+          .map(
+            (goal) => _ReminderItem(
+              title: goal.title,
+              date: goal.reminderDate!,
+              type: goal.isDebtGoal ? 'Debt journey' : 'Journey',
+              urgent: goal.reminderDate!.difference(now).inDays <= 5,
+            ),
+          ),
+      ...budgets
+          .where((budget) => budget.reminderDate != null)
+          .map(
+            (budget) => _ReminderItem(
+              title: budget.title,
+              date: budget.reminderDate!,
+              type: budget.isDebtPayment ? 'Debt budget' : 'Budget',
+              urgent: budget.reminderDate!.difference(now).inDays <= 5,
+            ),
+          ),
+    ]..sort((a, b) => a.date.compareTo(b.date));
+    return items.take(4).toList();
+  }
+
+  int get healthScore {
+    var score = 100;
+    if (overIncome) score -= 28;
+    if (overBudget) score -= 22;
+    if (monthlyIncome > 0) {
+      score -= ((monthlyExpenses / monthlyIncome).clamp(0.0, 1.3) * 24).round();
+    }
+    if (activeJourneys == 0) score -= 8;
+    if (profileSavings <= 0) score -= 8;
+    if (journeyProgress > 0.25) score += 5;
+    return score.clamp(0, 100);
+  }
+
+  Color get healthColor {
+    if (healthScore >= 75) return AppTheme.success;
+    if (healthScore >= 50) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  String get weeklyNarrative {
+    if (overIncome) {
+      return 'Expenses are above income this period. Pause optional spending and review Savings before approving more withdrawals.';
+    }
+    if (overBudget) {
+      return 'Budget pressure is building. A quick budget adjustment or smaller next transaction can bring the month back on track.';
+    }
+    if (activeJourneys > 0 && journeyProgress > 0.2) {
+      return 'Good momentum. Your budget, transactions, and journeys are moving together with room still available.';
+    }
+    return 'This week is steady. Add one transaction or journey update to keep the dashboard fully alive.';
+  }
+}
+
+class _ReminderItem {
+  const _ReminderItem({
+    required this.title,
+    required this.date,
+    required this.type,
+    required this.urgent,
+  });
+
+  final String title;
+  final DateTime date;
+  final String type;
+  final bool urgent;
+}
+
+class _DashboardTitle extends StatelessWidget {
+  const _DashboardTitle({required this.periodLabel});
+
+  final String periodLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Intelligent Dashboard',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ),
+        Text(
+          periodLabel,
+          style: GoogleFonts.inter(
+            color:
+                (Theme.of(context).textTheme.bodyMedium?.color ??
+                AppTheme.textSecondaryFor(context)),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HealthScoreHero extends StatelessWidget {
+  const _HealthScoreHero({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Theme.of(context).dividerColor),
+        boxShadow: AppTheme.softShadow,
+      ),
+      child: Row(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 92,
+                height: 92,
+                child: CircularProgressIndicator(
+                  value: analytics.healthScore / 100,
+                  strokeWidth: 9,
+                  backgroundColor: Theme.of(context).dividerColor,
+                  color: analytics.healthColor,
+                ),
+              ),
+              Text(
+                '${analytics.healthScore}',
+                style: GoogleFonts.plusJakartaSans(
+                  color: analytics.healthColor,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Financial Health Score',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  analytics.weeklyNarrative,
+                  style: GoogleFonts.inter(
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        AppTheme.textSecondaryFor(context)),
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickActionDeck extends StatelessWidget {
+  const _QuickActionDeck({
+    required this.onAddTransaction,
+    required this.onCreateBudget,
+    required this.onNewGoal,
+    required this.onViewTransactions,
+  });
+
+  final VoidCallback onAddTransaction;
+  final VoidCallback onCreateBudget;
+  final VoidCallback onNewGoal;
+  final VoidCallback onViewTransactions;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 2.25,
+      children: [
+        _DashboardAction(
+          label: 'Add Transaction',
+          icon: Icons.add_card_rounded,
+          color: AppTheme.primary,
+          onTap: onAddTransaction,
+        ),
+        _DashboardAction(
+          label: 'Create Budget',
+          icon: Icons.account_balance_wallet_rounded,
+          color: const Color(0xFF0EA5A4),
+          onTap: onCreateBudget,
+        ),
+        _DashboardAction(
+          label: 'New Journey',
+          icon: Icons.flag_rounded,
+          color: AppTheme.success,
+          onTap: onNewGoal,
+        ),
+        _DashboardAction(
+          label: 'All Transactions',
+          icon: Icons.receipt_long_rounded,
+          color: AppTheme.warning,
+          onTap: onViewTransactions,
+        ),
+      ],
+    );
+  }
+}
+
+class _DashboardAction extends StatelessWidget {
+  const _DashboardAction({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Theme.of(context).dividerColor),
+          boxShadow: AppTheme.softShadow,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BudgetOverviewCard extends StatelessWidget {
+  const _BudgetOverviewCard({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.account_balance_wallet_rounded,
+      title: 'Current Period Budget',
+      trailing: CurrencyUtils.format(analytics.remainingBudget),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _DashboardProgress(
+            value: analytics.budgetProgress,
+            color: analytics.overBudget ? AppTheme.error : AppTheme.primary,
+          ),
+          const SizedBox(height: 12),
+          _MetricRow(
+            leftLabel: 'Budgeted',
+            leftValue: CurrencyUtils.format(analytics.totalBudgeted),
+            rightLabel: analytics.overBudget ? 'Over' : 'Spent',
+            rightValue: CurrencyUtils.format(analytics.monthlyExpenses),
+          ),
+          if (analytics.overBudget) ...[
+            const SizedBox(height: 10),
+            _WarningText(
+              text:
+                  'Budget exceeded. Review categories before pulling from Savings.',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _IncomeExpenseCard extends StatelessWidget {
+  const _IncomeExpenseCard({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.compare_arrows_rounded,
+      title: 'Income vs Expenses',
+      trailing: CurrencyUtils.format(analytics.remainingIncome),
+      child: Column(
+        children: [
+          _DashboardProgress(
+            value: analytics.incomeProgress,
+            color: analytics.overIncome ? AppTheme.error : AppTheme.success,
+          ),
+          const SizedBox(height: 12),
+          _MetricRow(
+            leftLabel: 'Income',
+            leftValue: CurrencyUtils.format(analytics.monthlyIncome),
+            rightLabel: 'Expenses',
+            rightValue: CurrencyUtils.format(analytics.monthlyExpenses),
+          ),
+          if (analytics.overIncome) ...[
+            const SizedBox(height: 10),
+            _WarningText(
+              text:
+                  'Expenses are above income. Savings support should require confirmation.',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsJourneysCard extends StatelessWidget {
+  const _SavingsJourneysCard({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.savings_rounded,
+      title: 'Savings & Journeys',
+      trailing: '${analytics.activeJourneys} active',
+      child: Column(
+        children: [
+          _DashboardProgress(
+            value: analytics.journeyProgress,
+            color: AppTheme.primary,
+          ),
+          const SizedBox(height: 12),
+          _MetricRow(
+            leftLabel: 'Saved',
+            leftValue: CurrencyUtils.format(analytics.totalSaved),
+            rightLabel: 'Savings pool',
+            rightValue: CurrencyUtils.format(analytics.profileSavings),
+          ),
+          if (analytics.debtItems > 0) ...[
+            const SizedBox(height: 10),
+            _WarningText(
+              text:
+                  '${analytics.debtItems} debt reminder item(s) need tracking.',
+              color: AppTheme.warning,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderDeadlineCard extends StatelessWidget {
+  const _ReminderDeadlineCard({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.notifications_active_rounded,
+      title: 'Upcoming Reminders',
+      trailing: '${analytics.reminders.length}',
+      child: analytics.reminders.isEmpty
+          ? Text(
+              'No upcoming deadlines. Debt payments, bills, and journey reminders will appear here.',
+              style: GoogleFonts.inter(
+                color:
+                    (Theme.of(context).textTheme.bodyMedium?.color ??
+                    AppTheme.textSecondaryFor(context)),
+                height: 1.4,
+              ),
+            )
+          : Column(
+              children: analytics.reminders
+                  .map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.urgent
+                                ? Icons.priority_high_rounded
+                                : Icons.event_rounded,
+                            color: item.urgent
+                                ? AppTheme.warning
+                                : AppTheme.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                Text(
+                                  '${item.type} • ${DateFormat('MMM dd').format(item.date)}',
+                                  style: GoogleFonts.inter(
+                                    color:
+                                        (Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color ??
+                                        AppTheme.textSecondaryFor(context)),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+    );
+  }
+}
+
+class _WeeklyNarrativeCard extends StatelessWidget {
+  const _WeeklyNarrativeCard({required this.analytics});
+
+  final _HomeDashboardAnalytics analytics;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.auto_awesome_rounded,
+      title: 'Weekly Narrative',
+      trailing: 'Live',
+      child: Text(
+        analytics.weeklyNarrative,
+        style: GoogleFonts.inter(
+          color:
+              (Theme.of(context).textTheme.bodyMedium?.color ??
+              AppTheme.textSecondaryFor(context)),
+          height: 1.5,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _RecentActivityStrip extends StatelessWidget {
+  const _RecentActivityStrip({
+    required this.transactions,
+    required this.onViewAll,
+  });
+
+  final List<FinancialTransaction> transactions;
+  final VoidCallback onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardCard(
+      icon: Icons.receipt_long_rounded,
+      title: 'Recent Transactions',
+      trailing: 'See all',
+      onTrailingTap: onViewAll,
+      child: transactions.isEmpty
+          ? Text(
+              'No transactions yet.',
+              style: GoogleFonts.inter(
+                color:
+                    (Theme.of(context).textTheme.bodyMedium?.color ??
+                    AppTheme.textSecondaryFor(context)),
+              ),
+            )
+          : Column(
+              children: transactions
+                  .map(
+                    (txn) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              txn.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            CurrencyUtils.format(txn.amount),
+                            style: GoogleFonts.plusJakartaSans(
+                              color: txn.type == 'income'
+                                  ? AppTheme.success
+                                  : txn.type == 'transfer'
+                                  ? AppTheme.primary
+                                  : AppTheme.error,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+    );
+  }
+}
+
+class _DashboardCard extends StatelessWidget {
+  const _DashboardCard({
+    required this.icon,
+    required this.title,
+    required this.trailing,
+    required this.child,
+    this.onTrailingTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String trailing;
+  final Widget child;
+  final VoidCallback? onTrailingTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Theme.of(context).dividerColor),
+        boxShadow: AppTheme.softShadow,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: AppTheme.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: onTrailingTap,
+                child: Text(
+                  trailing,
+                  style: GoogleFonts.inter(
+                    color: AppTheme.primary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardProgress extends StatelessWidget {
+  const _DashboardProgress({required this.value, required this.color});
+
+  final double value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(999),
+      child: LinearProgressIndicator(
+        value: value,
+        minHeight: 9,
+        backgroundColor: Theme.of(context).dividerColor,
+        color: color,
+      ),
+    );
+  }
+}
+
+class _MetricRow extends StatelessWidget {
+  const _MetricRow({
+    required this.leftLabel,
+    required this.leftValue,
+    required this.rightLabel,
+    required this.rightValue,
+  });
+
+  final String leftLabel;
+  final String leftValue;
+  final String rightLabel;
+  final String rightValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _SmallMetric(label: leftLabel, value: leftValue),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _SmallMetric(label: rightLabel, value: rightValue),
+        ),
+      ],
+    );
+  }
+}
+
+class _SmallMetric extends StatelessWidget {
+  const _SmallMetric({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              color:
+                  (Theme.of(context).textTheme.bodyMedium?.color ??
+                  AppTheme.textSecondaryFor(context)),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WarningText extends StatelessWidget {
+  const _WarningText({required this.text, this.color = AppTheme.error});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.warning_amber_rounded, color: color, size: 18),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              color: color,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -517,7 +1488,7 @@ class _TopBar extends StatelessWidget {
                                 errorBuilder: (context, error, stackTrace) =>
                                     CircleAvatar(
                                       backgroundColor: primaryColor,
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.person_rounded,
                                         color: Colors.white,
                                       ),
@@ -525,7 +1496,7 @@ class _TopBar extends StatelessWidget {
                               )
                             : CircleAvatar(
                                 backgroundColor: primaryColor,
-                                child: const Icon(
+                                child: Icon(
                                   Icons.person_rounded,
                                   color: Colors.white,
                                 ),
@@ -554,7 +1525,7 @@ class _TopBar extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 17,
-                            color: const Color(0xFF0F172A),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -579,9 +1550,9 @@ class _TopBar extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                   boxShadow: AppTheme.softShadow,
                 ),
                 child: isRefreshing
@@ -593,9 +1564,9 @@ class _TopBar extends StatelessWidget {
                           color: AppTheme.primary,
                         ),
                       )
-                    : const Icon(
+                    : Icon(
                         Icons.refresh_rounded,
-                        color: Color(0xFF0F172A),
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 22,
                       ),
               ),
@@ -742,7 +1713,7 @@ class _SectionHeader extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF0F172A),
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         TextButton(onPressed: onTap, child: Text(actionLabel)),
@@ -780,9 +1751,9 @@ class _FeatureGrid extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: Theme.of(context).dividerColor),
               boxShadow: AppTheme.softShadow,
             ),
             child: Column(
@@ -806,8 +1777,8 @@ class _FeatureGrid extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.w700,
                           color: item.enabled
-                              ? AppTheme.textPrimary
-                              : AppTheme.textHint,
+                              ? Theme.of(context).colorScheme.onSurface
+                              : AppTheme.textHintFor(context),
                         ),
                       ),
                     ),
@@ -824,7 +1795,11 @@ class _FeatureGrid extends StatelessWidget {
                         child: Text(
                           'Paused',
                           style: GoogleFonts.inter(
-                            color: AppTheme.textSecondary,
+                            color:
+                                (Theme.of(
+                                  context,
+                                ).textTheme.bodyMedium?.color ??
+                                AppTheme.textSecondaryFor(context)),
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                           ),
@@ -877,7 +1852,9 @@ class _ProgressPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: AppTheme.isDark(context)
+            ? AppTheme.surfaceCardFor(context)
+            : AppTheme.textPrimaryFor(context),
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
@@ -982,9 +1959,9 @@ class _TransactionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -1009,7 +1986,7 @@ class _TransactionTile extends StatelessWidget {
                   txn.title,
                   style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1017,7 +1994,9 @@ class _TransactionTile extends StatelessWidget {
                   txn.category,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.textSecondary,
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        AppTheme.textSecondaryFor(context)),
                   ),
                 ),
               ],
@@ -1046,10 +2025,10 @@ class _EmptyState extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 40),
         child: Column(
           children: [
-            const Icon(
+            Icon(
               Icons.receipt_long_rounded,
               size: 64,
-              color: Color(0xFFE2E8F0),
+              color: Theme.of(context).dividerColor,
             ),
             const SizedBox(height: 16),
             Text(
@@ -1100,7 +2079,7 @@ class _DismissibleTransactionTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.delete_outline_rounded, color: Colors.white),
+            Icon(Icons.delete_outline_rounded, color: Colors.white),
           ],
         ),
       ),
@@ -1124,7 +2103,7 @@ class _DismissibleTransactionTile extends StatelessWidget {
             duration: const Duration(seconds: 4),
             action: SnackBarAction(
               label: 'UNDO',
-              textColor: const Color(0xFF00F2EA),
+              textColor: AppTheme.secondary,
               onPressed: () {
                 firestoreService.addTransaction(txn);
               },

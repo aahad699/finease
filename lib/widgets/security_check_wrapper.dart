@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 
 class SecurityCheckWrapper extends StatelessWidget {
   final Widget child;
@@ -72,7 +73,7 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
@@ -85,7 +86,7 @@ class _EmailVerificationGateState extends State<_EmailVerificationGate> {
                   color: const Color(0xFF2E3192).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.mark_email_unread_rounded,
                   size: 64,
                   color: Color(0xFF2E3192),

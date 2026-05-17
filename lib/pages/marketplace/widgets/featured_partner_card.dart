@@ -59,7 +59,7 @@ class FeaturedPartnerCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const Icon(Icons.north_east_rounded, color: Colors.white),
+                Icon(Icons.north_east_rounded, color: Colors.white),
               ],
             ),
             const Spacer(),

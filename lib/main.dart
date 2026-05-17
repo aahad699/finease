@@ -7,6 +7,7 @@ import 'models/app_config.dart';
 import 'services/app_config_service.dart';
 import 'services/auth_service.dart';
 import 'services/bootstrap_service.dart';
+import 'services/theme_service.dart';
 import 'pages/auth/email_verification_page.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/admin/admin_dashboard_screen.dart';
@@ -20,7 +21,10 @@ void main() async {
   await BootstrapService.ensureSpecialAccounts();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthService())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => ThemeService()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -36,10 +40,13 @@ class MyApp extends StatelessWidget {
       initialData: AppConfig.defaults(),
       builder: (context, snapshot) {
         final config = snapshot.data ?? AppConfig.defaults();
+        final themeService = context.watch<ThemeService>();
         return MaterialApp(
           title: config.brandName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeService.themeMode,
           home: const AuthWrapper(),
         );
       },

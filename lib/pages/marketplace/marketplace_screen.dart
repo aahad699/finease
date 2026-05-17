@@ -55,7 +55,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           'Partner marketplace access is temporarily paused by FinEase admin.',
       blockedIcon: Icons.storefront_outlined,
       child: Scaffold(
-        backgroundColor: AppTheme.background,
+        backgroundColor: AppTheme.backgroundFor(context),
         bottomNavigationBar: _CompareTray(
           count: _comparedPartnerIds.length,
           onCompare: firestoreService == null
@@ -71,15 +71,15 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             SliverAppBar(
               expandedHeight: 235,
               pinned: true,
-              backgroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppTheme.primary,
               flexibleSpace: FlexibleSpaceBar(
                 background: DecoratedBox(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFF0F172A),
                         AppTheme.primary,
-                        Color(0xFF0EA5A4),
+                        AppTheme.primary,
+                        AppTheme.secondary,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -669,7 +669,7 @@ class _SectionHeader extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontSize: 20,
             fontWeight: FontWeight.w800,
           ),
@@ -677,7 +677,7 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           subtitle,
-          style: GoogleFonts.inter(color: AppTheme.textSecondary, height: 1.45),
+          style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), height: 1.45),
         ),
       ],
     );
@@ -699,9 +699,9 @@ class _CompactOpportunityCard extends StatelessWidget {
         width: 220,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
           boxShadow: AppTheme.softShadow,
         ),
         child: Column(
@@ -712,7 +712,7 @@ class _CompactOpportunityCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -722,7 +722,7 @@ class _CompactOpportunityCard extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 13,
                 height: 1.45,
               ),
@@ -730,7 +730,7 @@ class _CompactOpportunityCard extends StatelessWidget {
             const Spacer(),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.local_fire_department_rounded,
                   color: Color(0xFFD97706),
                 ),
@@ -739,7 +739,7 @@ class _CompactOpportunityCard extends StatelessWidget {
                   child: Text(
                     '${partner.reviewCount}+ reviews',
                     style: GoogleFonts.inter(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -775,7 +775,7 @@ class _LocationOfferCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.location_on_rounded, color: Colors.white),
+            Icon(Icons.location_on_rounded, color: Colors.white),
             const SizedBox(height: 12),
             Text(
               partner.name,
@@ -883,8 +883,8 @@ class _ComparisonSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.78,
-      decoration: const BoxDecoration(
-        color: AppTheme.background,
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundFor(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
@@ -894,7 +894,7 @@ class _ComparisonSheet extends StatelessWidget {
             width: 48,
             height: 5,
             decoration: BoxDecoration(
-              color: AppTheme.border,
+              color: AppTheme.borderFor(context),
               borderRadius: BorderRadius.circular(999),
             ),
           ),
@@ -906,7 +906,7 @@ class _ComparisonSheet extends StatelessWidget {
                   child: Text(
                     'Compare partners',
                     style: GoogleFonts.plusJakartaSans(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -914,7 +914,7 @@ class _ComparisonSheet extends StatelessWidget {
                 ),
                 Text(
                   '${partners.length}/3 selected',
-                  style: GoogleFonts.inter(color: AppTheme.textSecondary),
+                  style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context)),
                 ),
               ],
             ),
@@ -925,7 +925,7 @@ class _ComparisonSheet extends StatelessWidget {
                     child: Text(
                       'Select at least two partners to compare key details side by side.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(color: AppTheme.textSecondary),
+                      style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context)),
                     ),
                   )
                 : SingleChildScrollView(
@@ -933,11 +933,11 @@ class _ComparisonSheet extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
                       headingTextStyle: GoogleFonts.plusJakartaSans(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontWeight: FontWeight.w800,
                       ),
                       dataTextStyle: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.4,
                       ),
                       columns: [

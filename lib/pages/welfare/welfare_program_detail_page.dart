@@ -21,7 +21,7 @@ class WelfareProgramDetailPage extends StatelessWidget {
     final appStatus = provider.applicationStatus(program.id);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: CustomScrollView(
         slivers: [
           _DetailAppBar(program: program, bookmarked: bookmarked, provider: provider),
@@ -85,7 +85,7 @@ class _DetailAppBar extends StatelessWidget {
       pinned: true,
       backgroundColor: AppTheme.primary,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
       actions: [
@@ -104,7 +104,7 @@ class _DetailAppBar extends StatelessWidget {
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(gradient: AppTheme.cardGradient),
+          decoration: BoxDecoration(gradient: AppTheme.cardGradient),
           padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -138,7 +138,7 @@ class _DetailAppBar extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.verified_rounded, color: Colors.white, size: 12),
+                          Icon(Icons.verified_rounded, color: Colors.white, size: 12),
                           const SizedBox(width: 4),
                           Text(
                             'Verified',
@@ -173,19 +173,19 @@ class _HeaderSection extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             height: 1.2,
           ),
         ),
         const SizedBox(height: 6),
         Row(
           children: [
-            const Icon(Icons.corporate_fare_rounded, size: 14, color: AppTheme.textSecondary),
+            Icon(Icons.corporate_fare_rounded, size: 14, color: AppTheme.textSecondaryFor(context)),
             const SizedBox(width: 5),
             Expanded(
               child: Text(
                 program.organization,
-                style: GoogleFonts.inter(color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -194,11 +194,11 @@ class _HeaderSection extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 14, color: AppTheme.textSecondary),
+              Icon(Icons.location_on_outlined, size: 14, color: AppTheme.textSecondaryFor(context)),
               const SizedBox(width: 5),
               Text(
                 program.regionRestriction!,
-                style: GoogleFonts.inter(color: AppTheme.textSecondary, fontSize: 13),
+                style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), fontSize: 13),
               ),
             ],
           ),
@@ -206,7 +206,7 @@ class _HeaderSection extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           program.description,
-          style: GoogleFonts.inter(color: AppTheme.textSecondary, height: 1.6, fontSize: 15),
+          style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), height: 1.6, fontSize: 15),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -246,9 +246,9 @@ class _MetadataRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Row(
@@ -259,9 +259,9 @@ class _MetadataRow extends StatelessWidget {
             icon: Icons.payments_outlined,
             iconColor: AppTheme.success,
           ),
-          _divider(),
+          _divider(context),
           _DifficultyTile(level: program.difficulty),
-          _divider(),
+          _divider(context),
           _MetaTile(
             label: 'Verification',
             value: program.isVerified ? 'Official' : 'Unverified',
@@ -273,11 +273,11 @@ class _MetadataRow extends StatelessWidget {
     );
   }
 
-  Widget _divider() => Container(
+  Widget _divider(BuildContext context) => Container(
         width: 1,
         height: 44,
         margin: const EdgeInsets.symmetric(horizontal: 8),
-        color: AppTheme.border,
+        color: AppTheme.borderFor(context),
       );
 }
 
@@ -302,14 +302,14 @@ class _MetaTile extends StatelessWidget {
             style: GoogleFonts.plusJakartaSans(
               fontWeight: FontWeight.w800,
               fontSize: 11,
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textSecondary),
+            style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textSecondaryFor(context)),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -342,7 +342,7 @@ class _DifficultyTile extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             'Complexity',
-            style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textSecondary),
+            style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textSecondaryFor(context)),
           ),
         ],
       ),
@@ -403,9 +403,9 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -428,14 +428,14 @@ class _SectionCard extends StatelessWidget {
                   title,
                   style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 15,
                   ),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, color: AppTheme.border),
+          Divider(height: 1, color: AppTheme.borderFor(context)),
           Padding(
             padding: const EdgeInsets.all(16),
             child: child,
@@ -474,7 +474,7 @@ class _BulletList extends StatelessWidget {
                     Expanded(
                       child: Text(
                         item,
-                        style: GoogleFonts.inter(color: AppTheme.textSecondary, height: 1.5),
+                        style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), height: 1.5),
                       ),
                     ),
                   ],
@@ -519,7 +519,7 @@ class _StepList extends StatelessWidget {
                   Container(
                     width: 2,
                     height: 44,
-                    color: AppTheme.border,
+                    color: AppTheme.borderFor(context),
                   ),
               ],
             ),
@@ -534,7 +534,7 @@ class _StepList extends StatelessWidget {
                       step.title,
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontSize: 14,
                       ),
                     ),
@@ -542,7 +542,7 @@ class _StepList extends StatelessWidget {
                     Text(
                       step.description,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.5,
                         fontSize: 13,
                       ),
@@ -568,9 +568,9 @@ class _ContactCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -586,21 +586,21 @@ class _ContactCard extends StatelessWidget {
                     color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.contact_support_outlined, color: AppTheme.primary, size: 18),
+                  child: Icon(Icons.contact_support_outlined, color: AppTheme.primary, size: 18),
                 ),
                 const SizedBox(width: 10),
                 Text(
                   'Contact & Helpline',
                   style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 15,
                   ),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, color: AppTheme.border),
+          Divider(height: 1, color: AppTheme.borderFor(context)),
           if (program.helplineNumber.isNotEmpty)
             _ContactRow(
               icon: Icons.phone_outlined,
@@ -641,7 +641,7 @@ class _ContactRow extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textSecondary)),
+                Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textSecondaryFor(context))),
                 Text(
                   value,
                   style: GoogleFonts.inter(
@@ -653,7 +653,7 @@ class _ContactRow extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondary, size: 18),
+            Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondaryFor(context), size: 18),
           ],
         ),
       ),
@@ -678,7 +678,7 @@ class _TrackingSection extends StatelessWidget {
           'Track Your Application',
           style: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w800,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontSize: 16,
           ),
         ),
@@ -732,17 +732,17 @@ class _StatusChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary : AppTheme.surface,
+          color: isSelected ? AppTheme.primary : AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.border,
+            color: isSelected ? AppTheme.primary : AppTheme.borderFor(context),
           ),
         ),
         child: Text(
           label,
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : AppTheme.textSecondary,
+            color: isSelected ? Colors.white : AppTheme.textSecondaryFor(context),
             fontSize: 13,
           ),
         ),
@@ -763,8 +763,8 @@ class _BottomCTA extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
-          border: Border(top: BorderSide(color: AppTheme.border)),
+          color: AppTheme.surfaceFor(context),
+          border: Border(top: BorderSide(color: AppTheme.borderFor(context))),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -781,7 +781,7 @@ class _BottomCTA extends StatelessWidget {
                 onPressed: () async {
                   await UrlLauncherService.instance.launchExternalUrl(context, program.officialUrl);
                 },
-                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                icon: Icon(Icons.open_in_new_rounded, size: 16),
                 label: const Text('Apply on Official Website'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -800,7 +800,7 @@ class _BottomCTA extends StatelessWidget {
                   ),
                   style: IconButton.styleFrom(
                     padding: const EdgeInsets.all(13),
-                    side: BorderSide(color: AppTheme.border),
+                    side: BorderSide(color: AppTheme.borderFor(context)),
                   ),
                 );
               },

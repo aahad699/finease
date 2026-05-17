@@ -92,7 +92,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     final email = auth.user?.email ?? 'your email address';
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -102,9 +102,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.surfaceFor(context),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: AppTheme.borderFor(context)),
                   boxShadow: AppTheme.softShadow,
                 ),
                 child: Column(
@@ -118,7 +118,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                         color: AppTheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.mark_email_unread_rounded,
                         color: AppTheme.primary,
                         size: 30,
@@ -130,14 +130,14 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'We sent a verification link to $email. FinEase stays locked until this email is verified.',
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.5,
                       ),
                     ),
@@ -172,7 +172,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Icon(Icons.verified_rounded),
+                            : Icon(Icons.verified_rounded),
                         label: Text(
                           _checking ? 'Checking...' : 'I Verified My Email',
                         ),
@@ -191,7 +191,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Icon(Icons.refresh_rounded),
+                            : Icon(Icons.refresh_rounded),
                         label: Text(
                           _resending
                               ? 'Sending...'
@@ -202,7 +202,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                     const SizedBox(height: 12),
                     TextButton.icon(
                       onPressed: () => auth.signOut(),
-                      icon: const Icon(Icons.logout_rounded),
+                      icon: Icon(Icons.logout_rounded),
                       label: const Text('Use another account'),
                     ),
                   ],

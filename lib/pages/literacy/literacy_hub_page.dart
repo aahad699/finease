@@ -105,7 +105,7 @@ class _LiteracyExperienceState extends State<_LiteracyExperience> {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -229,9 +229,9 @@ class _HubHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF15157D), Color(0xFF2E3192), Color(0xFF0EA5A4)],
+          colors: [AppTheme.primary, AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -380,9 +380,9 @@ class _ProgressOverviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -401,14 +401,14 @@ class _ProgressOverviewCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Progress, XP, streak awareness, and quiz momentum.',
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 13,
                         height: 1.35,
                       ),
@@ -489,7 +489,7 @@ class _LevelProgressBar extends StatelessWidget {
               'Level ${plan.level} progression',
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w800,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
               ),
             ),
             const Spacer(),
@@ -497,7 +497,7 @@ class _LevelProgressBar extends StatelessWidget {
               '${plan.levelXp} / ${plan.xpPerLevel} XP',
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
               ),
             ),
@@ -552,7 +552,7 @@ class _OverviewStat extends StatelessWidget {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 20,
               fontWeight: FontWeight.w900,
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
             ),
           ),
           const SizedBox(height: 2),
@@ -561,7 +561,7 @@ class _OverviewStat extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -585,10 +585,7 @@ class _AchievementPrompt extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFF131525),
-            const Color(0xFF2E3192).withValues(alpha: 0.94),
-          ],
+          colors: [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -603,7 +600,7 @@ class _AchievementPrompt extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.auto_awesome_rounded,
               color: Color(0xFF1BFFFF),
             ),
@@ -658,7 +655,7 @@ class _ContinueLearningCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          colors: [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -833,9 +830,9 @@ class _ForYouRoadmapSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -856,7 +853,7 @@ class _ForYouRoadmapSection extends StatelessWidget {
                     Text(
                       'For You',
                       style: GoogleFonts.plusJakartaSans(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontSize: 21,
                         fontWeight: FontWeight.w900,
                       ),
@@ -865,7 +862,7 @@ class _ForYouRoadmapSection extends StatelessWidget {
                     Text(
                       plan.personalizedBrief,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.45,
                         fontWeight: FontWeight.w500,
                       ),
@@ -928,7 +925,7 @@ class _RoadmapStepTile extends StatelessWidget {
         ? AppTheme.success
         : step.active
         ? AppTheme.primary
-        : AppTheme.textHint;
+        : AppTheme.textHintFor(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -972,7 +969,7 @@ class _RoadmapStepTile extends StatelessWidget {
                       child: Text(
                         step.title,
                         style: GoogleFonts.plusJakartaSans(
-                          color: AppTheme.textPrimary,
+                          color: AppTheme.textPrimaryFor(context),
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
                         ),
@@ -992,7 +989,7 @@ class _RoadmapStepTile extends StatelessWidget {
                 Text(
                   step.subtitle,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.35,
                     fontSize: 13,
                   ),
@@ -1084,7 +1081,7 @@ class _TrackCard extends StatelessWidget {
           color: selected ? track.color.withValues(alpha: 0.1) : Colors.white,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: selected ? track.color : AppTheme.border,
+            color: selected ? track.color : AppTheme.borderFor(context),
             width: selected ? 1.5 : 1,
           ),
           boxShadow: AppTheme.softShadow,
@@ -1108,7 +1105,7 @@ class _TrackCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
@@ -1119,7 +1116,7 @@ class _TrackCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
@@ -1130,7 +1127,7 @@ class _TrackCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 height: 1.3,
               ),
@@ -1299,9 +1296,9 @@ class _AchievementGallery extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -1340,7 +1337,7 @@ class _AchievementGallery extends StatelessWidget {
                     border: Border.all(
                       color: achievement.unlocked
                           ? achievement.color.withValues(alpha: 0.2)
-                          : AppTheme.border,
+                          : AppTheme.borderFor(context),
                     ),
                   ),
                   child: Column(
@@ -1361,7 +1358,7 @@ class _AchievementGallery extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                           color: achievement.unlocked
                               ? Colors.white
-                              : AppTheme.textPrimary,
+                              : AppTheme.textPrimaryFor(context),
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                         ),
@@ -1374,7 +1371,7 @@ class _AchievementGallery extends StatelessWidget {
                         style: GoogleFonts.inter(
                           color: achievement.unlocked
                               ? Colors.white.withValues(alpha: 0.75)
-                              : AppTheme.textSecondary,
+                              : AppTheme.textSecondaryFor(context),
                           fontSize: 12,
                           height: 1.35,
                         ),
@@ -1423,9 +1420,9 @@ class _LearningLibraryControls extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -1434,7 +1431,7 @@ class _LearningLibraryControls extends StatelessWidget {
             controller: controller,
             onChanged: onQueryChanged,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: Icon(Icons.search_rounded),
               suffixIcon: query.isEmpty
                   ? null
                   : IconButton(
@@ -1443,16 +1440,16 @@ class _LearningLibraryControls extends StatelessWidget {
                         controller.clear();
                         onQueryChanged('');
                       },
-                      icon: const Icon(Icons.close_rounded),
+                      icon: Icon(Icons.close_rounded),
                     ),
               hintText: 'Search budgeting, zakat, taxes, investing, PKR...',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppTheme.border),
+                borderSide: BorderSide(color: AppTheme.borderFor(context)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppTheme.border),
+                borderSide: BorderSide(color: AppTheme.borderFor(context)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -1532,22 +1529,22 @@ class _EmptyLibraryState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.search_off_rounded,
-            color: AppTheme.textHint,
+            color: AppTheme.textHintFor(context),
             size: 34,
           ),
           const SizedBox(height: 10),
           Text(
             'No matching courses',
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w900,
               fontSize: 18,
             ),
@@ -1556,7 +1553,7 @@ class _EmptyLibraryState extends StatelessWidget {
           Text(
             'Try a broader topic like saving, tax, zakat, investing, or business.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(color: AppTheme.textSecondary),
+            style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context)),
           ),
         ],
       ),
@@ -1581,9 +1578,9 @@ class _CategoryRail extends StatelessWidget {
             margin: const EdgeInsets.only(right: 10),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surfaceFor(context),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: AppTheme.borderFor(context)),
               boxShadow: AppTheme.softShadow,
             ),
             child: Row(
@@ -1597,7 +1594,7 @@ class _CategoryRail extends StatelessWidget {
                     Text(
                       course.category,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontWeight: FontWeight.w800,
                         fontSize: 13,
                       ),
@@ -1606,7 +1603,7 @@ class _CategoryRail extends StatelessWidget {
                     Text(
                       '${(progress * 100).round()}% path progress',
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1638,14 +1635,14 @@ class _SectionHeader extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 22,
             fontWeight: FontWeight.w900,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
           ),
         ),
         const SizedBox(height: 6),
         Text(
           subtitle,
           style: GoogleFonts.inter(
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
             height: 1.45,
             fontWeight: FontWeight.w500,
           ),
@@ -1680,12 +1677,12 @@ class _CourseJourneyCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isRecommended
               ? const Color(0xFF0EA5A4).withValues(alpha: 0.42)
-              : AppTheme.border,
+              : AppTheme.borderFor(context),
         ),
         boxShadow: [
           BoxShadow(
@@ -1718,7 +1715,7 @@ class _CourseJourneyCard extends StatelessWidget {
                   height: 178,
                   color: const Color(0xFFE8EDF7),
                   alignment: Alignment.center,
-                  child: const Icon(Icons.image_not_supported_rounded),
+                  child: Icon(Icons.image_not_supported_rounded),
                 ),
               ),
               Positioned.fill(
@@ -1807,7 +1804,7 @@ class _CourseJourneyCard extends StatelessWidget {
                 Text(
                   course.subtitle,
                   style: GoogleFonts.plusJakartaSans(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -1816,7 +1813,7 @@ class _CourseJourneyCard extends StatelessWidget {
                 Text(
                   course.description,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.5,
                     fontSize: 14,
                   ),
@@ -1846,7 +1843,7 @@ class _CourseJourneyCard extends StatelessWidget {
                   'Course lessons',
                   style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w900,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 15,
                   ),
                 ),
@@ -1876,11 +1873,11 @@ class _CourseJourneyCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => _openExternal(course.externalUrl),
-                        icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                        icon: Icon(Icons.open_in_new_rounded, size: 18),
                         label: const Text('Course Link'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.primary,
-                          side: const BorderSide(color: AppTheme.border),
+                          side: BorderSide(color: AppTheme.borderFor(context)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -1892,14 +1889,14 @@ class _CourseJourneyCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => _showCourseVideo(context, course),
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.play_circle_outline_rounded,
                           size: 18,
                         ),
                         label: const Text('Watch'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFDC2626),
-                          side: const BorderSide(color: AppTheme.border),
+                          side: BorderSide(color: AppTheme.borderFor(context)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -1919,7 +1916,7 @@ class _CourseJourneyCard extends StatelessWidget {
                             context: context,
                             builder: (_) => _QuizDialog(course: course),
                           ),
-                    icon: const Icon(Icons.quiz_rounded),
+                    icon: Icon(Icons.quiz_rounded),
                     label: Text(
                       quizScore.isEmpty ? 'Take Quiz' : 'Retake Quiz',
                     ),
@@ -1968,7 +1965,7 @@ class _OutcomeBand extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.flag_rounded, color: Color(0xFF0EA5A4), size: 20),
+          Icon(Icons.flag_rounded, color: Color(0xFF0EA5A4), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -2020,9 +2017,9 @@ class _CourseDepthPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         children: rows.map((row) {
@@ -2038,15 +2035,15 @@ class _CourseDepthPanel extends StatelessWidget {
                   child: RichText(
                     text: TextSpan(
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.35,
                         fontSize: 13,
                       ),
                       children: [
                         TextSpan(
                           text: '${row.label}: ',
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
+                          style: TextStyle(
+                            color: AppTheme.textPrimaryFor(context),
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -2087,7 +2084,7 @@ class _CourseProgressLine extends StatelessWidget {
             Text(
               'Path progress',
               style: GoogleFonts.inter(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontWeight: FontWeight.w800,
                 fontSize: 13,
               ),
@@ -2096,7 +2093,7 @@ class _CourseProgressLine extends StatelessWidget {
             Text(
               '$completed/$total lessons',
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
@@ -2153,7 +2150,7 @@ class _LessonStepRow extends StatelessWidget {
         ? AppTheme.success
         : isNext
         ? AppTheme.primary
-        : AppTheme.textHint;
+        : AppTheme.textHintFor(context);
     final preview = lesson.content.length > 170
         ? '${lesson.content.substring(0, 170)}...'
         : lesson.content;
@@ -2190,7 +2187,7 @@ class _LessonStepRow extends StatelessWidget {
                 ? AppTheme.success.withValues(alpha: 0.18)
                 : isNext
                 ? AppTheme.primary.withValues(alpha: 0.18)
-                : AppTheme.border,
+                : AppTheme.borderFor(context),
           ),
         ),
         child: Row(
@@ -2226,7 +2223,7 @@ class _LessonStepRow extends StatelessWidget {
                         child: Text(
                           lesson.title,
                           style: GoogleFonts.plusJakartaSans(
-                            color: AppTheme.textPrimary,
+                            color: AppTheme.textPrimaryFor(context),
                             fontWeight: FontWeight.w900,
                             fontSize: 15,
                           ),
@@ -2243,7 +2240,7 @@ class _LessonStepRow extends StatelessWidget {
                             ? AppTheme.success
                             : isNext
                             ? AppTheme.primary
-                            : AppTheme.textHint,
+                            : AppTheme.textHintFor(context),
                       ),
                     ],
                   ),
@@ -2251,7 +2248,7 @@ class _LessonStepRow extends StatelessWidget {
                   Text(
                     lesson.description,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       height: 1.35,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -2263,7 +2260,7 @@ class _LessonStepRow extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       height: 1.45,
                       fontSize: 13,
                     ),
@@ -2288,7 +2285,7 @@ class _LessonStepRow extends StatelessWidget {
                           lesson: lesson,
                           completed: completed,
                         ),
-                        icon: const Icon(Icons.menu_book_rounded, size: 16),
+                        icon: Icon(Icons.menu_book_rounded, size: 16),
                         label: const Text('Read lesson'),
                         style: TextButton.styleFrom(
                           visualDensity: VisualDensity.compact,
@@ -2324,7 +2321,7 @@ class _LessonStepRow extends StatelessWidget {
                   completed
                       ? Icons.check_circle_rounded
                       : Icons.radio_button_unchecked_rounded,
-                  color: completed ? AppTheme.success : AppTheme.textHint,
+                  color: completed ? AppTheme.success : AppTheme.textHintFor(context),
                 ),
               ),
             ),
@@ -2356,8 +2353,8 @@ class _LessonDetailSheet extends StatelessWidget {
       minChildSize: 0.45,
       builder: (context, controller) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: SafeArea(
@@ -2369,7 +2366,7 @@ class _LessonDetailSheet extends StatelessWidget {
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppTheme.border,
+                    color: AppTheme.borderFor(context),
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -2405,7 +2402,7 @@ class _LessonDetailSheet extends StatelessWidget {
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w900,
-                                    color: AppTheme.textPrimary,
+                                    color: AppTheme.textPrimaryFor(context),
                                   ),
                                 ),
                               ],
@@ -2443,7 +2440,7 @@ class _LessonDetailSheet extends StatelessWidget {
                       Text(
                         lesson.description,
                         style: GoogleFonts.inter(
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondaryFor(context),
                           fontSize: 15,
                           height: 1.45,
                           fontWeight: FontWeight.w600,
@@ -2453,9 +2450,9 @@ class _LessonDetailSheet extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                          color: AppTheme.surfaceCardFor(context),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppTheme.border),
+                          border: Border.all(color: AppTheme.borderFor(context)),
                         ),
                         child: Text(
                           lesson.content,
@@ -2479,7 +2476,7 @@ class _LessonDetailSheet extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.lightbulb_rounded,
                               color: AppTheme.primary,
                             ),
@@ -2488,7 +2485,7 @@ class _LessonDetailSheet extends StatelessWidget {
                               child: Text(
                                 course.outcome,
                                 style: GoogleFonts.inter(
-                                  color: AppTheme.textPrimary,
+                                  color: AppTheme.textPrimaryFor(context),
                                   height: 1.4,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13,
@@ -2642,7 +2639,7 @@ class _LessonApplicationPanel extends StatelessWidget {
         Text(
           'Practice Lab',
           style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontWeight: FontWeight.w900,
             fontSize: 17,
           ),
@@ -2685,7 +2682,7 @@ class _LessonResourceCard extends StatelessWidget {
                 Text(
                   section.title,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -2696,7 +2693,7 @@ class _LessonResourceCard extends StatelessWidget {
                     child: Text(
                       item,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.38,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -2776,9 +2773,9 @@ class _QuizDialogState extends State<_QuizDialog> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF15157D), Color(0xFF2E3192)],
+                  colors: [AppTheme.primary, AppTheme.secondary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -2896,8 +2893,8 @@ class _QuizDialogState extends State<_QuizDialog> {
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceFor(context),
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(26),
                 ),
@@ -3030,7 +3027,7 @@ class _QuizQuestionCard extends StatelessWidget {
               child: Text(
                 question.prompt,
                 style: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
                   height: 1.35,
@@ -3056,7 +3053,7 @@ class _QuizQuestionCard extends StatelessWidget {
                       : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? AppTheme.primary : AppTheme.border,
+                    color: isSelected ? AppTheme.primary : AppTheme.borderFor(context),
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -3066,7 +3063,7 @@ class _QuizQuestionCard extends StatelessWidget {
                       isSelected
                           ? Icons.check_circle_rounded
                           : Icons.circle_outlined,
-                      color: isSelected ? AppTheme.primary : AppTheme.textHint,
+                      color: isSelected ? AppTheme.primary : AppTheme.textHintFor(context),
                       size: 21,
                     ),
                     const SizedBox(width: 10),
@@ -3074,7 +3071,7 @@ class _QuizQuestionCard extends StatelessWidget {
                       child: Text(
                         question.options[optionIndex],
                         style: GoogleFonts.inter(
-                          color: AppTheme.textPrimary,
+                          color: AppTheme.textPrimaryFor(context),
                           fontWeight: isSelected
                               ? FontWeight.w800
                               : FontWeight.w600,
@@ -3186,7 +3183,7 @@ class _QuizResultDialog extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: perfect
                       ? const [Color(0xFF047857), Color(0xFF0EA5A4)]
-                      : const [Color(0xFF15157D), Color(0xFF2E3192)],
+                      : const [AppTheme.primary, AppTheme.secondary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -3275,7 +3272,7 @@ class _QuizResultDialog extends StatelessWidget {
                                 child: Text(
                                   question.prompt,
                                   style: GoogleFonts.inter(
-                                    color: AppTheme.textPrimary,
+                                    color: AppTheme.textPrimaryFor(context),
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
@@ -3286,7 +3283,7 @@ class _QuizResultDialog extends StatelessWidget {
                           Text(
                             'Your answer: $selectedLabel',
                             style: GoogleFonts.inter(
-                              color: AppTheme.textSecondary,
+                              color: AppTheme.textSecondaryFor(context),
                               fontWeight: FontWeight.w700,
                               height: 1.35,
                             ),
@@ -3296,7 +3293,7 @@ class _QuizResultDialog extends StatelessWidget {
                             Text(
                               'Correct answer: ${question.options[question.correctIndex]}',
                               style: GoogleFonts.inter(
-                                color: AppTheme.textPrimary,
+                                color: AppTheme.textPrimaryFor(context),
                                 fontWeight: FontWeight.w900,
                                 height: 1.35,
                               ),
@@ -3306,7 +3303,7 @@ class _QuizResultDialog extends StatelessWidget {
                           Text(
                             question.explanation,
                             style: GoogleFonts.inter(
-                              color: AppTheme.textSecondary,
+                              color: AppTheme.textSecondaryFor(context),
                               height: 1.45,
                               fontSize: 13,
                             ),
@@ -3372,7 +3369,7 @@ class _QuizScoreBanner extends StatelessWidget {
             child: Text(
               'Latest quiz: $score/$total with $percentage% mastery',
               style: GoogleFonts.inter(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -3418,8 +3415,8 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
@@ -3435,7 +3432,7 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
                   width: 42,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppTheme.border,
+                    color: AppTheme.borderFor(context),
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -3444,7 +3441,7 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
               Text(
                 widget.course.title,
                 style: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontSize: 21,
                   fontWeight: FontWeight.w900,
                 ),
@@ -3453,7 +3450,7 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
               Text(
                 'Embedded lesson video',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -3474,7 +3471,7 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.4,
                       ),
                     ),
@@ -3485,7 +3482,7 @@ class _EmbeddedVideoSheetState extends State<_EmbeddedVideoSheet> {
                       Uri.parse(widget.course.videoUrl),
                       mode: LaunchMode.externalApplication,
                     ),
-                    icon: const Icon(Icons.open_in_new_rounded, size: 17),
+                    icon: Icon(Icons.open_in_new_rounded, size: 17),
                     label: const Text('Open'),
                   ),
                 ],
@@ -3506,9 +3503,9 @@ class _CommunityLearningCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Row(
@@ -3525,14 +3522,14 @@ class _CommunityLearningCard extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 19,
                     fontWeight: FontWeight.w900,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Discuss lessons, budgeting habits, and savings questions with other FinEase learners.',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.45,
                   ),
                 ),
@@ -4257,14 +4254,14 @@ class _SkillTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Text(
         label,
         style: GoogleFonts.inter(
-          color: AppTheme.textSecondary,
+          color: AppTheme.textSecondaryFor(context),
           fontWeight: FontWeight.w800,
           fontSize: 12,
         ),
@@ -4315,7 +4312,7 @@ class _StreakPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.local_fire_department_rounded,
             color: Color(0xFFF59E0B),
             size: 16,

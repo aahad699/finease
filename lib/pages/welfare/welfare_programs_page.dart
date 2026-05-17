@@ -53,12 +53,12 @@ class _WelfarePageContentState extends State<_WelfarePageContent> {
     final provider = context.watch<WelfareProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       appBar: AppBar(
-        backgroundColor: AppTheme.background,
+        backgroundColor: AppTheme.backgroundFor(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Colors.black,
           ),
@@ -97,7 +97,7 @@ class _BookmarkBadge extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        const Icon(Icons.bookmark_outline_rounded, color: Colors.black87),
+        Icon(Icons.bookmark_outline_rounded, color: Colors.black87),
         if (count > 0)
           Positioned(
             top: -4,
@@ -105,7 +105,7 @@ class _BookmarkBadge extends StatelessWidget {
             child: Container(
               width: 16,
               height: 16,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.primary,
                 shape: BoxShape.circle,
               ),
@@ -165,7 +165,7 @@ class _ProgramList extends StatelessWidget {
             (p) => _ProgramCard(program: p, isHighlighted: true),
           ),
           const SizedBox(height: 8),
-          Divider(color: AppTheme.border),
+          Divider(color: AppTheme.borderFor(context)),
           const SizedBox(height: 12),
           _SectionHeader(
             title: 'All Programs',
@@ -208,7 +208,7 @@ class _HeroHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Discover real welfare, scholarship, health and loan programs in Pakistan.',
-          style: GoogleFonts.inter(color: AppTheme.textSecondary, height: 1.5),
+          style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context), height: 1.5),
         ),
       ],
     );
@@ -232,10 +232,10 @@ class _SearchBar extends StatelessWidget {
           onChanged: provider.setSearch,
           decoration: InputDecoration(
             hintText: 'Search by title, organization, tags or keywords…',
-            prefixIcon: const Icon(Icons.search_rounded),
+            prefixIcon: Icon(Icons.search_rounded),
             suffixIcon: value.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                     onPressed: () {
                       controller.clear();
                       provider.setSearch('');
@@ -301,12 +301,12 @@ class _TagChips extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: provider.selectedTags.contains(tag)
                           ? AppTheme.primary.withValues(alpha: 0.12)
-                          : AppTheme.surface,
+                          : AppTheme.surfaceFor(context),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: provider.selectedTags.contains(tag)
                             ? AppTheme.primary
-                            : AppTheme.border,
+                            : AppTheme.borderFor(context),
                       ),
                     ),
                     child: Text(
@@ -316,7 +316,7 @@ class _TagChips extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: provider.selectedTags.contains(tag)
                             ? AppTheme.primary
-                            : AppTheme.textSecondary,
+                            : AppTheme.textSecondaryFor(context),
                       ),
                     ),
                   ),
@@ -342,17 +342,17 @@ class _ActiveFilterBanner extends StatelessWidget {
       padding: const EdgeInsets.only(top: 10),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.filter_list_rounded,
             size: 14,
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
           ),
           const SizedBox(width: 6),
           Text(
             '${provider.activeFilterCount} filters active',
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
             ),
           ),
           const Spacer(),
@@ -398,10 +398,10 @@ class _Chip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.primary : AppTheme.surface,
+            color: selected ? AppTheme.primary : AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? AppTheme.primary : AppTheme.border,
+              color: selected ? AppTheme.primary : AppTheme.borderFor(context),
             ),
           ),
           child: Text(
@@ -409,7 +409,7 @@ class _Chip extends StatelessWidget {
             style: GoogleFonts.inter(
               fontWeight: FontWeight.w600,
               fontSize: 13,
-              color: selected ? Colors.white : AppTheme.textSecondary,
+              color: selected ? Colors.white : AppTheme.textSecondaryFor(context),
             ),
           ),
         ),
@@ -440,14 +440,14 @@ class _SectionHeader extends StatelessWidget {
           title,
           style: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w800,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontSize: 16,
           ),
         ),
         const Spacer(),
         Text(
           subtitle,
-          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textSecondary),
+          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textSecondaryFor(context)),
         ),
       ],
     );
@@ -481,12 +481,12 @@ class _ProgramCard extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isHighlighted
                   ? AppTheme.primary.withValues(alpha: 0.3)
-                  : AppTheme.border,
+                  : AppTheme.borderFor(context),
               width: isHighlighted ? 1.5 : 1,
             ),
             boxShadow: isHighlighted
@@ -576,7 +576,7 @@ class _ProgramCard extends StatelessWidget {
                                     _statusLabel(appStatus),
                                     style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: AppTheme.textSecondary,
+                                      color: AppTheme.textSecondaryFor(context),
                                     ),
                                   ),
                                 ),
@@ -594,7 +594,7 @@ class _ProgramCard extends StatelessWidget {
                               key: ValueKey(bookmarked),
                               color: bookmarked
                                   ? AppTheme.primary
-                                  : AppTheme.textSecondary,
+                                  : AppTheme.textSecondaryFor(context),
                               size: 22,
                             ),
                           ),
@@ -615,7 +615,7 @@ class _ProgramCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -624,7 +624,7 @@ class _ProgramCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.5,
                         fontSize: 13,
                       ),
@@ -873,9 +873,9 @@ class _SkeletonCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -924,7 +924,7 @@ class _Bone extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppTheme.border,
+        color: AppTheme.borderFor(context),
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -950,7 +950,7 @@ class _EmptyState extends StatelessWidget {
                 color: AppTheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.search_off_rounded,
                 size: 44,
                 color: AppTheme.primary,
@@ -962,18 +962,18 @@ class _EmptyState extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
               ),
             ),
             const SizedBox(height: 6),
             Text(
               'Try adjusting your search or filters.',
-              style: GoogleFonts.inter(color: AppTheme.textSecondary),
+              style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context)),
             ),
             const SizedBox(height: 20),
             TextButton.icon(
               onPressed: onClear,
-              icon: const Icon(Icons.refresh_rounded),
+              icon: Icon(Icons.refresh_rounded),
               label: const Text('Clear Filters'),
             ),
           ],
@@ -998,24 +998,24 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_rounded,
               size: 52,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
             ),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
+              icon: Icon(Icons.refresh_rounded),
               label: const Text('Retry'),
             ),
           ],

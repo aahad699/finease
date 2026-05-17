@@ -10,9 +10,8 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(title: const Text('About FinEase')),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -67,13 +66,16 @@ class AboutPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _InfoRow(label: 'Name', value: dev['name'] ?? '-'),
-                    _InfoRow(label: 'Roll Number', value: dev['rollNumber'] ?? '-'),
+                    _InfoRow(
+                      label: 'Roll Number',
+                      value: dev['rollNumber'] ?? '-',
+                    ),
                     const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () => _openLink(dev['linkedin']),
-                        icon: const Icon(Icons.open_in_new_rounded),
+                        icon: Icon(Icons.open_in_new_rounded),
                         label: const Text('Open LinkedIn'),
                       ),
                     ),
@@ -107,9 +109,9 @@ class _Panel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,12 +142,18 @@ class _LineItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.primary),
+          Icon(
+            Icons.check_circle_rounded,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.inter(color: AppTheme.textSecondary),
+              style: GoogleFonts.inter(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
             ),
           ),
         ],
@@ -171,7 +179,7 @@ class _InfoRow extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -180,7 +188,7 @@ class _InfoRow extends StatelessWidget {
             child: Text(
               value,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
             ),

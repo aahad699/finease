@@ -58,7 +58,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 980;
         return Scaffold(
-          backgroundColor: AppTheme.background,
+          backgroundColor: AppTheme.backgroundFor(context),
           body: SafeArea(
             child: isWide
                 ? Row(
@@ -71,7 +71,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         onSeed: _seedAdminSamples,
                         onSignOut: () => context.read<AuthService>().signOut(),
                       ),
-                      const VerticalDivider(width: 1, color: AppTheme.border),
+                      VerticalDivider(width: 1, color: AppTheme.borderFor(context)),
                       Expanded(child: _contentArea(isWide: true)),
                     ],
                   )
@@ -102,9 +102,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final tab = _tabs[_tabIndex];
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 18, 24, 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppTheme.border)),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceFor(context),
+        border: Border(bottom: BorderSide(color: AppTheme.borderFor(context))),
       ),
       child: Row(
         children: [
@@ -126,13 +126,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                   ),
                 ),
                 Text(
                   'Signed in as ${AppConstants.adminEmail}',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 12,
                   ),
                 ),
@@ -150,7 +150,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               foregroundColor: AppTheme.primary,
             ),
             onPressed: () => context.read<AuthService>().signOut(),
-            icon: const Icon(Icons.logout_rounded),
+            icon: Icon(Icons.logout_rounded),
           ),
         ],
       ),
@@ -159,7 +159,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _mobileHeader() {
     return Container(
-      decoration: const BoxDecoration(gradient: AppTheme.cardGradient),
+      decoration: BoxDecoration(gradient: AppTheme.cardGradient),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,19 +191,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               IconButton(
                 tooltip: 'Seed review samples',
                 onPressed: _seedAdminSamples,
-                icon: const Icon(Icons.auto_fix_high_rounded),
+                icon: Icon(Icons.auto_fix_high_rounded),
                 color: Colors.white,
               ),
               IconButton(
                 tooltip: 'Copy report',
                 onPressed: _copyReport,
-                icon: const Icon(Icons.file_copy_rounded),
+                icon: Icon(Icons.file_copy_rounded),
                 color: Colors.white,
               ),
               IconButton(
                 tooltip: 'Sign out',
                 onPressed: () => context.read<AuthService>().signOut(),
-                icon: const Icon(Icons.logout_rounded),
+                icon: Icon(Icons.logout_rounded),
                 color: Colors.white,
               ),
             ],
@@ -269,7 +269,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       return FloatingActionButton.extended(
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_business_rounded),
+        icon: Icon(Icons.add_business_rounded),
         label: const Text('Partner'),
         onPressed: () => _showPartnerDialog(),
       );
@@ -278,7 +278,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       return FloatingActionButton.extended(
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_task_rounded),
+        icon: Icon(Icons.add_task_rounded),
         label: const Text('Case'),
         onPressed: () => _showWelfareDialog(),
       );
@@ -592,7 +592,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           icon: Icons.monitor_heart_rounded,
           action: TextButton.icon(
             onPressed: () => _showMetricsDialog(data),
-            icon: const Icon(Icons.tune_rounded, size: 18),
+            icon: Icon(Icons.tune_rounded, size: 18),
             label: const Text('Edit'),
           ),
           child: Column(
@@ -1272,7 +1272,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   config.announcementEnabled ? 'On' : 'Off',
                   config.announcementEnabled
                       ? AppTheme.warning
-                      : AppTheme.textSecondary,
+                      : AppTheme.textSecondaryFor(context),
                 ),
                 _SummaryItem(
                   'Community',
@@ -1452,7 +1452,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -1483,12 +1483,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onChanged: (value) => setState(() => _search = value.toLowerCase()),
             decoration: InputDecoration(
               hintText: hint,
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: Icon(Icons.search_rounded),
               suffixIcon: _search.isEmpty
                   ? null
                   : IconButton(
                       tooltip: 'Clear search',
-                      icon: const Icon(Icons.close_rounded),
+                      icon: Icon(Icons.close_rounded),
                       onPressed: () {
                         _searchController.clear();
                         setState(() => _search = '');
@@ -1506,12 +1506,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 selected: isSelected,
                 label: Text(filter),
                 selectedColor: AppTheme.primary,
-                backgroundColor: Colors.white,
+                backgroundColor: AppTheme.surfaceFor(context),
                 side: BorderSide(
-                  color: isSelected ? AppTheme.primary : AppTheme.border,
+                  color: isSelected ? AppTheme.primary : AppTheme.borderFor(context),
                 ),
                 labelStyle: GoogleFonts.inter(
-                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  color: isSelected ? Colors.white : AppTheme.textSecondaryFor(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
@@ -2080,7 +2080,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 );
               });
             },
-            icon: const Icon(Icons.save_rounded),
+            icon: Icon(Icons.save_rounded),
             label: const Text('Save'),
           ),
         ],
@@ -2221,7 +2221,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 }
               });
             },
-            icon: const Icon(Icons.save_rounded),
+            icon: Icon(Icons.save_rounded),
             label: const Text('Save'),
           ),
         ],
@@ -2350,7 +2350,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     }
                   });
                 },
-                icon: const Icon(Icons.save_rounded),
+                icon: Icon(Icons.save_rounded),
                 label: const Text('Save'),
               ),
             ],
@@ -2393,13 +2393,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               children: [
                 SelectableText(
                   _field(data, 'email', 'No email'),
-                  style: GoogleFonts.inter(color: AppTheme.textSecondary),
+                  style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context)),
                 ),
                 const SizedBox(height: 10),
                 SelectableText(
                   'UID: ${doc.id}',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 12,
                   ),
                 ),
@@ -2565,7 +2565,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   );
                 });
               },
-              icon: const Icon(Icons.save_rounded),
+              icon: Icon(Icons.save_rounded),
               label: const Text('Save user'),
             ),
           ],
@@ -2616,7 +2616,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.textPrimary,
+                              color: AppTheme.textPrimaryFor(context),
                             ),
                           ),
                           Text(
@@ -2624,7 +2624,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.inter(
-                              color: AppTheme.textSecondary,
+                              color: AppTheme.textSecondaryFor(context),
                               fontSize: 12,
                             ),
                           ),
@@ -2634,7 +2634,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     IconButton(
                       tooltip: 'Copy path',
                       onPressed: () => _copyText(path, 'Document path copied.'),
-                      icon: const Icon(Icons.copy_rounded),
+                      icon: Icon(Icons.copy_rounded),
                     ),
                   ],
                 ),
@@ -2653,7 +2653,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         Text(
                           entry.key,
                           style: GoogleFonts.inter(
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondaryFor(context),
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                           ),
@@ -2662,7 +2662,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         SelectableText(
                           _valueToText(entry.value),
                           style: GoogleFonts.inter(
-                            color: AppTheme.textPrimary,
+                            color: AppTheme.textPrimaryFor(context),
                             height: 1.35,
                           ),
                         ),
@@ -2707,7 +2707,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       label: Text(label),
       style: OutlinedButton.styleFrom(
         foregroundColor: AppTheme.primary,
-        side: const BorderSide(color: AppTheme.border),
+        side: BorderSide(color: AppTheme.borderFor(context)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
@@ -2722,7 +2722,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       style: OutlinedButton.styleFrom(
         alignment: Alignment.centerLeft,
         foregroundColor: AppTheme.primary,
-        side: const BorderSide(color: AppTheme.border),
+        side: BorderSide(color: AppTheme.borderFor(context)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       ),
@@ -2834,7 +2834,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       case 'admin':
         return AppTheme.primary;
       default:
-        return AppTheme.textSecondary;
+        return AppTheme.textSecondaryFor(context);
     }
   }
 
@@ -2897,7 +2897,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: AppTheme.border),
+      border: Border.all(color: AppTheme.borderFor(context)),
       boxShadow: AppTheme.softShadow,
     );
   }
@@ -2963,7 +2963,7 @@ class _AdminSideRail extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.plusJakartaSans(
-                            color: AppTheme.textPrimary,
+                            color: AppTheme.textPrimaryFor(context),
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
                           ),
@@ -2971,7 +2971,7 @@ class _AdminSideRail extends StatelessWidget {
                         Text(
                           'Admin Panel',
                           style: GoogleFonts.inter(
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondaryFor(context),
                             fontSize: 12,
                           ),
                         ),
@@ -3015,7 +3015,7 @@ class _AdminSideRail extends StatelessWidget {
                           size: 21,
                           color: selected
                               ? AppTheme.primary
-                              : AppTheme.textSecondary,
+                              : AppTheme.textSecondaryFor(context),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -3024,7 +3024,7 @@ class _AdminSideRail extends StatelessWidget {
                             style: GoogleFonts.inter(
                               color: selected
                                   ? AppTheme.primary
-                                  : AppTheme.textSecondary,
+                                  : AppTheme.textSecondaryFor(context),
                               fontWeight: selected
                                   ? FontWeight.w800
                                   : FontWeight.w600,
@@ -3371,7 +3371,7 @@ class _AppConfigEditorState extends State<_AppConfigEditor> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.save_rounded),
+                  icon: Icon(Icons.save_rounded),
                   label: const Text('Save Live App Controls'),
                 ),
               ),
@@ -3471,14 +3471,14 @@ class _AppConfigEditorState extends State<_AppConfigEditor> {
         title: Text(
           title,
           style: GoogleFonts.inter(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontWeight: FontWeight.w800,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: GoogleFonts.inter(
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
             fontSize: 12,
             height: 1.35,
           ),
@@ -3606,9 +3606,9 @@ class _Panel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -3635,14 +3635,14 @@ class _Panel extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 12,
                         height: 1.35,
                       ),
@@ -3693,9 +3693,9 @@ class _MetricTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -3715,7 +3715,7 @@ class _MetricTile extends StatelessWidget {
               Text(
                 '${((item.progress ?? 0) * 100).round()}%',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 11,
                 ),
@@ -3739,7 +3739,7 @@ class _MetricTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
             ),
           ),
           Text(
@@ -3748,7 +3748,7 @@ class _MetricTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -3793,7 +3793,7 @@ class _OperationsBarChart extends StatelessWidget {
           alignment: BarChartAlignment.spaceAround,
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => AppTheme.textPrimary,
+              getTooltipColor: (_) => AppTheme.textPrimaryFor(context),
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 final datum = data[group.x.toInt()];
                 return BarTooltipItem(
@@ -3810,7 +3810,7 @@ class _OperationsBarChart extends StatelessWidget {
           gridData: FlGridData(
             drawVerticalLine: false,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: AppTheme.border,
+              color: AppTheme.borderFor(context),
               strokeWidth: 1,
               dashArray: [4, 4],
             ),
@@ -3830,7 +3830,7 @@ class _OperationsBarChart extends StatelessWidget {
                 getTitlesWidget: (value, meta) => Text(
                   NumberFormat.compact().format(value),
                   style: GoogleFonts.inter(
-                    color: AppTheme.textHint,
+                    color: AppTheme.textHintFor(context),
                     fontSize: 10,
                   ),
                 ),
@@ -3850,7 +3850,7 @@ class _OperationsBarChart extends StatelessWidget {
                     child: Text(
                       data[index].label,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
@@ -3950,9 +3950,9 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -3980,7 +3980,7 @@ class _InfoCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.w900,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -3989,7 +3989,7 @@ class _InfoCard extends StatelessWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         height: 1.35,
                       ),
                     ),
@@ -4013,9 +4013,9 @@ class _InfoCard extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceCard,
+                        color: AppTheme.surfaceCardFor(context),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: AppTheme.borderFor(context)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -4023,7 +4023,7 @@ class _InfoCard extends StatelessWidget {
                           Icon(
                             meta.icon,
                             size: 14,
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondaryFor(context),
                           ),
                           const SizedBox(width: 5),
                           ConstrainedBox(
@@ -4033,7 +4033,7 @@ class _InfoCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.inter(
-                                color: AppTheme.textSecondary,
+                                color: AppTheme.textSecondaryFor(context),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -4086,11 +4086,11 @@ class _ActionGrid extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             alignment: Alignment.centerLeft,
             foregroundColor: AppTheme.primary,
-            side: const BorderSide(color: AppTheme.border),
+            side: BorderSide(color: AppTheme.borderFor(context)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            backgroundColor: Colors.white,
+            backgroundColor: AppTheme.surfaceFor(context),
           ),
         );
       },
@@ -4121,9 +4121,9 @@ class _MiniActivity extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceCard,
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Row(
         children: [
@@ -4145,7 +4145,7 @@ class _MiniActivity extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -4154,7 +4154,7 @@ class _MiniActivity extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 12,
                   ),
                 ),
@@ -4210,7 +4210,7 @@ class _HealthRow extends StatelessWidget {
                     child: Text(
                       label,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
                       ),
@@ -4303,19 +4303,19 @@ class _EmbeddedEmpty extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 46, color: AppTheme.textHint),
+          Icon(icon, size: 46, color: AppTheme.textHintFor(context)),
           const SizedBox(height: 10),
           Text(
             title,
             textAlign: TextAlign.center,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w800,
               fontSize: 16,
             ),
@@ -4325,7 +4325,7 @@ class _EmbeddedEmpty extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               height: 1.4,
             ),
           ),
@@ -4348,7 +4348,7 @@ class _LoadingView extends StatelessWidget {
         children: [
           const CircularProgressIndicator(color: AppTheme.primary),
           const SizedBox(height: 12),
-          Text(label, style: GoogleFonts.inter(color: AppTheme.textSecondary)),
+          Text(label, style: GoogleFonts.inter(color: AppTheme.textSecondaryFor(context))),
         ],
       ),
     );

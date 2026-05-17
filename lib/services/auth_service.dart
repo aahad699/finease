@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -331,6 +333,65 @@ class AuthService extends ChangeNotifier {
 
       throw Exception(e.code);
     }
+  }
+
+  Future<void> updateProfilePhotoUrl(String photoUrl) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'requires-recent-login',
+        message: 'Please sign in before updating your profile picture.',
+      );
+    }
+    await user.updatePhotoURL(photoUrl.trim().isEmpty ? null : photoUrl.trim());
+    await user.reload();
+    _user = _auth.currentUser;
+    await _firestoreService?.saveUserProfile({
+      'photoUrl': _user?.photoURL ?? '',
+      'photoDataUrl': '',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    notifyListeners();
+  }
+
+  Future<void> updateProfilePhotoBytes({
+    required Uint8List bytes,
+    required String fileName,
+    String? contentType,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'requires-recent-login',
+        message: 'Please sign in before updating your profile picture.',
+      );
+    }
+    if (bytes.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-photo',
+        message: 'Please choose a valid image file.',
+      );
+    }
+
+    final resolvedContentType =
+        contentType ??
+        switch (fileName.split('.').last.toLowerCase()) {
+          'png' => 'image/png',
+          'webp' => 'image/webp',
+          _ => 'image/jpeg',
+        };
+
+    final photoDataUrl =
+        'data:$resolvedContentType;base64,${base64Encode(bytes)}';
+    await user.updatePhotoURL(null);
+    await user.reload();
+    _user = _auth.currentUser;
+    await _firestoreService?.saveUserProfile({
+      'photoUrl': '',
+      'photoDataUrl': photoDataUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    notifyListeners();
   }
 
   // =========================

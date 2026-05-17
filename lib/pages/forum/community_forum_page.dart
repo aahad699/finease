@@ -108,7 +108,7 @@ class _CommunityForumPageState extends State<CommunityForumPage>
         }
 
         return Scaffold(
-          backgroundColor: AppTheme.background,
+          backgroundColor: AppTheme.backgroundFor(context),
           body: Stack(
             children: [
               const _ForumAmbientBackground(),
@@ -116,14 +116,14 @@ class _CommunityForumPageState extends State<CommunityForumPage>
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   SliverAppBar(
                     pinned: true,
-                    backgroundColor: AppTheme.background.withValues(
+                    backgroundColor: AppTheme.backgroundFor(context).withValues(
                       alpha: 0.88,
                     ),
                     elevation: innerBoxIsScrolled ? 1 : 0,
                     title: Text(
                       _forumCopy(_language, 'title'),
                       style: GoogleFonts.plusJakartaSans(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
                       ),
@@ -140,7 +140,7 @@ class _CommunityForumPageState extends State<CommunityForumPage>
                     bottom: TabBar(
                       controller: _tabController,
                       labelColor: AppTheme.primary,
-                      unselectedLabelColor: AppTheme.textSecondary,
+                      unselectedLabelColor: AppTheme.textSecondaryFor(context),
                       indicatorColor: AppTheme.primary,
                       labelStyle: GoogleFonts.inter(
                         fontSize: 14,
@@ -208,8 +208,8 @@ class _CommunityForumPageState extends State<CommunityForumPage>
                 : () => _showPausedSnack(config.supportMessage),
             backgroundColor: config.forumPostingEnabled
                 ? AppTheme.primary
-                : AppTheme.textHint,
-            icon: const Icon(Icons.edit_rounded, color: Colors.white),
+                : AppTheme.textHintFor(context),
+            icon: Icon(Icons.edit_rounded, color: Colors.white),
             label: Text(
               config.forumPostingEnabled ? 'Post' : 'Posting paused',
               style: GoogleFonts.inter(
@@ -331,7 +331,7 @@ class _ForumFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppTheme.background,
+      color: AppTheme.backgroundFor(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -443,13 +443,13 @@ class _SortMenu extends StatelessWidget {
         width: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
         ),
         child: Icon(
           sortBy == 'createdAt' ? Icons.sort_rounded : Icons.whatshot_rounded,
-          color: AppTheme.textSecondary,
+          color: AppTheme.textSecondaryFor(context),
           size: 20,
         ),
       ),
@@ -477,14 +477,14 @@ class _LanguageMenu extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppTheme.surface.withValues(alpha: 0.72),
+          color: AppTheme.surfaceFor(context).withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.translate_rounded,
               size: 16,
               color: AppTheme.primary,
@@ -493,7 +493,7 @@ class _LanguageMenu extends StatelessWidget {
             Text(
               language.shortLabel,
               style: GoogleFonts.inter(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
               ),
@@ -569,7 +569,7 @@ class _FocusButton extends StatelessWidget {
             children: [
               Icon(
                 focus.icon,
-                color: selected ? Colors.white : AppTheme.textSecondary,
+                color: selected ? Colors.white : AppTheme.textSecondaryFor(context),
                 size: 16,
               ),
               const SizedBox(width: 5),
@@ -579,7 +579,7 @@ class _FocusButton extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: selected ? Colors.white : AppTheme.textSecondary,
+                    color: selected ? Colors.white : AppTheme.textSecondaryFor(context),
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
@@ -730,7 +730,7 @@ class _ForumDashboardHeader extends StatelessWidget {
                     Text(
                       _forumCopy(language, 'heroTitle'),
                       style: GoogleFonts.plusJakartaSans(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         height: 1.12,
@@ -740,7 +740,7 @@ class _ForumDashboardHeader extends StatelessWidget {
                     Text(
                       _forumCopy(language, 'heroSubtitle'),
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 13,
                         height: 1.45,
                       ),
@@ -828,7 +828,7 @@ class _DashboardMetric extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppTheme.surface.withValues(alpha: 0.62),
+          color: AppTheme.surfaceFor(context).withValues(alpha: 0.62),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.white.withValues(alpha: 0.52)),
         ),
@@ -840,7 +840,7 @@ class _DashboardMetric extends StatelessWidget {
             Text(
               value,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontSize: 19,
                 fontWeight: FontWeight.w900,
               ),
@@ -851,7 +851,7 @@ class _DashboardMetric extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
               ),
@@ -897,7 +897,7 @@ class _TrendingDiscussionStrip extends StatelessWidget {
               color: AppTheme.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.trending_up_rounded,
               color: AppTheme.primary,
             ),
@@ -910,7 +910,7 @@ class _TrendingDiscussionStrip extends StatelessWidget {
                 Text(
                   _forumCopy(language, 'trending'),
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
@@ -922,7 +922,7 @@ class _TrendingDiscussionStrip extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
@@ -948,7 +948,7 @@ class _AiCoachBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(
+        Icon(
           Icons.psychology_alt_outlined,
           color: AppTheme.primary,
           size: 18,
@@ -958,7 +958,7 @@ class _AiCoachBanner extends StatelessWidget {
           child: Text(
             _coachCopy(language, feedFocus),
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
               height: 1.35,
@@ -1024,9 +1024,9 @@ class _LearningPathCard extends StatelessWidget {
       width: 196,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.surface.withValues(alpha: 0.86),
+        color: AppTheme.surfaceFor(context).withValues(alpha: 0.86),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: [
           BoxShadow(
             color: path.color.withValues(alpha: 0.10),
@@ -1045,7 +1045,7 @@ class _LearningPathCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontSize: 13,
               fontWeight: FontWeight.w800,
             ),
@@ -1056,7 +1056,7 @@ class _LearningPathCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: path.progress,
               minHeight: 6,
-              backgroundColor: AppTheme.border,
+              backgroundColor: AppTheme.borderFor(context),
               valueColor: AlwaysStoppedAnimation<Color>(path.color),
             ),
           ),
@@ -1111,7 +1111,7 @@ class _AiPulseOrb extends StatelessWidget {
                 backgroundColor: Colors.white.withValues(alpha: 0.26),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-              const Icon(Icons.auto_awesome_rounded, color: Colors.white),
+              Icon(Icons.auto_awesome_rounded, color: Colors.white),
             ],
           ),
         );
@@ -1194,7 +1194,7 @@ class _ForumPostCardState extends State<_ForumPostCard> {
                   Text(
                     post.title,
                     style: GoogleFonts.plusJakartaSans(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       height: 1.25,
@@ -1211,7 +1211,7 @@ class _ForumPostCardState extends State<_ForumPostCard> {
                           ? TextOverflow.visible
                           : TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 13,
                         height: 1.55,
                       ),
@@ -1262,7 +1262,7 @@ class _ForumPostCardState extends State<_ForumPostCard> {
               ),
             ),
             const SizedBox(height: 14),
-            Divider(color: AppTheme.border, height: 1),
+            Divider(color: AppTheme.borderFor(context), height: 1),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
               child: Row(
@@ -1372,7 +1372,7 @@ class _PostAuthorRow extends StatelessWidget {
                       post.displayAuthorName,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
@@ -1380,9 +1380,9 @@ class _PostAuthorRow extends StatelessWidget {
                   ),
                   if (post.isAnonymous) ...[
                     const SizedBox(width: 6),
-                    const Icon(
+                    Icon(
                       Icons.lock_outline_rounded,
-                      color: AppTheme.textHint,
+                      color: AppTheme.textHintFor(context),
                       size: 14,
                     ),
                   ],
@@ -1396,7 +1396,7 @@ class _PostAuthorRow extends StatelessWidget {
                       _formatTime(post.createdAt),
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1439,7 +1439,7 @@ class _ReactionButton extends StatelessWidget {
     return Tooltip(
       message: reactionType.label,
       child: Material(
-        color: selected ? color.withValues(alpha: 0.10) : AppTheme.surface,
+        color: selected ? color.withValues(alpha: 0.10) : AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
@@ -1469,7 +1469,7 @@ class _ReactionButton extends StatelessWidget {
               border: Border.all(
                 color: selected
                     ? color.withValues(alpha: 0.35)
-                    : AppTheme.border,
+                    : AppTheme.borderFor(context),
               ),
             ),
             child: Row(
@@ -1478,14 +1478,14 @@ class _ReactionButton extends StatelessWidget {
                 Icon(
                   selected ? reactionType.filledIcon : reactionType.outlineIcon,
                   size: 17,
-                  color: selected ? color : AppTheme.textSecondary,
+                  color: selected ? color : AppTheme.textSecondaryFor(context),
                 ),
                 if (count > 0) ...[
                   const SizedBox(width: 4),
                   Text(
                     '$count',
                     style: GoogleFonts.inter(
-                      color: selected ? color : AppTheme.textSecondary,
+                      color: selected ? color : AppTheme.textSecondaryFor(context),
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1511,7 +1511,7 @@ class _CommentsButton extends StatelessWidget {
     return Tooltip(
       message: commentsEnabled ? 'Open comments' : 'Commenting paused',
       child: Material(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
@@ -1533,20 +1533,20 @@ class _CommentsButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 9),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: AppTheme.borderFor(context)),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.chat_bubble_outline_rounded,
                   size: 17,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentsCount}',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -1586,7 +1586,7 @@ class _SaveButton extends StatelessWidget {
           onPressed: () => _toggleSave(savedDoc, isSaved),
           icon: Icon(
             isSaved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-            color: isSaved ? AppTheme.primary : AppTheme.textSecondary,
+            color: isSaved ? AppTheme.primary : AppTheme.textSecondaryFor(context),
           ),
         );
       },
@@ -1647,9 +1647,9 @@ class _AiActionMenu extends StatelessWidget {
           child: Text('Detect key insights'),
         ),
       ],
-      icon: const Icon(
+      icon: Icon(
         Icons.auto_awesome_outlined,
-        color: AppTheme.textSecondary,
+        color: AppTheme.textSecondaryFor(context),
       ),
     );
   }
@@ -1688,8 +1688,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
       maxChildSize: 0.94,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.surface,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           ),
           child: Column(
@@ -1699,7 +1699,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 width: 42,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppTheme.border,
+                  color: AppTheme.borderFor(context),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -1828,7 +1828,7 @@ class _CommentsHeader extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                 ),
@@ -1837,7 +1837,7 @@ class _CommentsHeader extends StatelessWidget {
               Text(
                 '${post.commentsCount} comments and replies',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontSize: 12,
                 ),
               ),
@@ -1944,7 +1944,7 @@ class _CommentTile extends StatelessWidget {
               width: 2,
               height: 82,
               margin: const EdgeInsets.only(right: 10, top: 4),
-              color: AppTheme.border,
+              color: AppTheme.borderFor(context),
             ),
           Expanded(
             child: Container(
@@ -1952,12 +1952,12 @@ class _CommentTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: comment.isBestAnswer
                     ? AppTheme.success.withValues(alpha: 0.08)
-                    : AppTheme.surfaceCard,
+                    : AppTheme.surfaceCardFor(context),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: comment.isBestAnswer
                       ? AppTheme.success.withValues(alpha: 0.24)
-                      : AppTheme.border,
+                      : AppTheme.borderFor(context),
                 ),
               ),
               child: Column(
@@ -1975,16 +1975,16 @@ class _CommentTile extends StatelessWidget {
                             Text(
                               comment.displayName,
                               style: GoogleFonts.inter(
-                                color: AppTheme.textPrimary,
+                                color: AppTheme.textPrimaryFor(context),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                             if (comment.isAnonymous)
-                              const Icon(
+                              Icon(
                                 Icons.lock_outline_rounded,
                                 size: 12,
-                                color: AppTheme.textHint,
+                                color: AppTheme.textHintFor(context),
                               ),
                             if (!comment.isAnonymous)
                               _ReputationPill(
@@ -2010,7 +2010,7 @@ class _CommentTile extends StatelessWidget {
                       Text(
                         _formatTime(comment.createdAt),
                         style: GoogleFonts.inter(
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textSecondaryFor(context),
                           fontSize: 10,
                         ),
                       ),
@@ -2020,7 +2020,7 @@ class _CommentTile extends StatelessWidget {
                   Text(
                     comment.content,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       fontSize: 13,
                       height: 1.45,
                     ),
@@ -2039,7 +2039,7 @@ class _CommentTile extends StatelessWidget {
                         onPressed: userId.isEmpty
                             ? null
                             : () => onReply(comment),
-                        icon: const Icon(Icons.reply_rounded, size: 16),
+                        icon: Icon(Icons.reply_rounded, size: 16),
                         label: const Text('Reply'),
                         style: TextButton.styleFrom(
                           visualDensity: VisualDensity.compact,
@@ -2056,7 +2056,7 @@ class _CommentTile extends StatelessWidget {
                               commentId: comment.id,
                             );
                           },
-                          icon: const Icon(Icons.push_pin_outlined, size: 16),
+                          icon: Icon(Icons.push_pin_outlined, size: 16),
                           label: const Text('Best'),
                           style: TextButton.styleFrom(
                             visualDensity: VisualDensity.compact,
@@ -2113,7 +2113,7 @@ class _CommentReactionButton extends StatelessWidget {
         visualDensity: VisualDensity.compact,
         padding: EdgeInsets.zero,
         minimumSize: const Size(72, 30),
-        foregroundColor: selected ? AppTheme.success : AppTheme.textSecondary,
+        foregroundColor: selected ? AppTheme.success : AppTheme.textSecondaryFor(context),
       ),
     );
   }
@@ -2171,7 +2171,7 @@ class _CommentComposer extends StatelessWidget {
                     child: Text(
                       'Replying to ${replyingTo!.displayName}',
                       style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textSecondaryFor(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -2181,7 +2181,7 @@ class _CommentComposer extends StatelessWidget {
                     tooltip: 'Cancel reply',
                     visualDensity: VisualDensity.compact,
                     onPressed: onCancelReply,
-                    icon: const Icon(Icons.close_rounded, size: 18),
+                    icon: Icon(Icons.close_rounded, size: 18),
                   ),
                 ],
               ),
@@ -2218,7 +2218,7 @@ class _CommentComposer extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                    : const Icon(Icons.send_rounded, color: Colors.white),
+                    : Icon(Icons.send_rounded, color: Colors.white),
               ),
             ],
           ),
@@ -2232,7 +2232,7 @@ class _CommentComposer extends StatelessWidget {
               title: Text(
                 'Comment anonymously',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -2283,8 +2283,8 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
       maxChildSize: 0.94,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.surface,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           ),
           child: SingleChildScrollView(
@@ -2303,7 +2303,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
                     width: 42,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppTheme.border,
+                      color: AppTheme.borderFor(context),
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -2312,7 +2312,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
                 Text(
                   'Create a finance discussion',
                   style: GoogleFonts.plusJakartaSans(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                   ),
@@ -2321,7 +2321,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
                 Text(
                   'Structure the post so people can learn from it quickly.',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     fontSize: 13,
                   ),
                 ),
@@ -2394,14 +2394,14 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
               title: Text(
                 'Safe-mode anonymous posting',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
               subtitle: Text(
                 'Your identity is hidden in the forum while authorId stays securely stored for moderation.',
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontSize: 12,
                 ),
               ),
@@ -2463,7 +2463,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
           Text(
             'Category',
             style: GoogleFonts.inter(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontSize: 13,
               fontWeight: FontWeight.w800,
             ),
@@ -2665,7 +2665,7 @@ class _CategoriesGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final category = _categories[index];
         return Material(
-          color: AppTheme.surface,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             borderRadius: BorderRadius.circular(8),
@@ -2674,7 +2674,7 @@ class _CategoriesGrid extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.border),
+                border: Border.all(color: AppTheme.borderFor(context)),
                 boxShadow: AppTheme.softShadow,
               ),
               child: Column(
@@ -2693,7 +2693,7 @@ class _CategoriesGrid extends StatelessWidget {
                   Text(
                     category.name,
                     style: GoogleFonts.plusJakartaSans(
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -2703,7 +2703,7 @@ class _CategoriesGrid extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       fontSize: 11,
                       height: 1.35,
                     ),
@@ -2733,7 +2733,7 @@ class _ComposerStep extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontSize: 16,
             fontWeight: FontWeight.w800,
           ),
@@ -2763,7 +2763,7 @@ class _StepIndicator extends StatelessWidget {
               child: Container(
                 height: 1,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
-                color: step > index ? AppTheme.primary : AppTheme.border,
+                color: step > index ? AppTheme.primary : AppTheme.borderFor(context),
               ),
             ),
         ],
@@ -2787,23 +2787,23 @@ class _StepDot extends StatelessWidget {
           height: 30,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppTheme.primary : AppTheme.surface,
+            color: selected ? AppTheme.primary : AppTheme.surfaceFor(context),
             shape: BoxShape.circle,
             border: Border.all(
-              color: selected ? AppTheme.primary : AppTheme.border,
+              color: selected ? AppTheme.primary : AppTheme.borderFor(context),
             ),
           ),
           child: Icon(
             selected ? Icons.check_rounded : Icons.circle_outlined,
             size: 16,
-            color: selected ? Colors.white : AppTheme.textHint,
+            color: selected ? Colors.white : AppTheme.textHintFor(context),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
           style: GoogleFonts.inter(
-            color: selected ? AppTheme.primary : AppTheme.textSecondary,
+            color: selected ? AppTheme.primary : AppTheme.textSecondaryFor(context),
             fontSize: 10,
             fontWeight: FontWeight.w700,
           ),
@@ -2827,7 +2827,7 @@ class _PostTypeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? type.color : AppTheme.surface,
+      color: selected ? type.color : AppTheme.surfaceFor(context),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
@@ -2837,7 +2837,7 @@ class _PostTypeOption extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: selected ? type.color : AppTheme.border),
+            border: Border.all(color: selected ? type.color : AppTheme.borderFor(context)),
           ),
           child: Row(
             children: [
@@ -2847,7 +2847,7 @@ class _PostTypeOption extends StatelessWidget {
                 child: Text(
                   type.label,
                   style: GoogleFonts.inter(
-                    color: selected ? Colors.white : AppTheme.textPrimary,
+                    color: selected ? Colors.white : AppTheme.textPrimaryFor(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                   ),
@@ -2877,7 +2877,7 @@ class _FilterChipButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? AppTheme.primary : AppTheme.surface,
+      color: selected ? AppTheme.primary : AppTheme.surfaceFor(context),
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
@@ -2890,13 +2890,13 @@ class _FilterChipButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: selected ? AppTheme.primary : AppTheme.border,
+              color: selected ? AppTheme.primary : AppTheme.borderFor(context),
             ),
           ),
           child: Text(
             label,
             style: GoogleFonts.inter(
-              color: selected ? Colors.white : AppTheme.textSecondary,
+              color: selected ? Colors.white : AppTheme.textSecondaryFor(context),
               fontSize: compact ? 12 : 13,
               fontWeight: FontWeight.w700,
             ),
@@ -2921,7 +2921,7 @@ class _TypeFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? type.color : AppTheme.surface,
+      color: selected ? type.color : AppTheme.surfaceFor(context),
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
@@ -2930,7 +2930,7 @@ class _TypeFilterChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: selected ? type.color : AppTheme.border),
+            border: Border.all(color: selected ? type.color : AppTheme.borderFor(context)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -3072,9 +3072,9 @@ class _PollPreview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceCard,
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         children: [
@@ -3109,7 +3109,7 @@ class _VisualFinanceStory extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             post.postType.color.withValues(alpha: 0.10),
-            AppTheme.surfaceCard.withValues(alpha: 0.74),
+            AppTheme.surfaceCardFor(context).withValues(alpha: 0.74),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -3126,7 +3126,7 @@ class _VisualFinanceStory extends StatelessWidget {
                 child: Text(
                   _storyTitle(post.postType),
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),
@@ -3148,7 +3148,7 @@ class _VisualFinanceStory extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 7,
-              backgroundColor: AppTheme.border,
+              backgroundColor: AppTheme.borderFor(context),
               valueColor: AlwaysStoppedAnimation<Color>(post.postType.color),
             ),
           ),
@@ -3223,7 +3223,7 @@ class _BreakdownLegend extends StatelessWidget {
         Text(
           item.label,
           style: GoogleFonts.inter(
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
             fontSize: 10,
             fontWeight: FontWeight.w700,
           ),
@@ -3264,7 +3264,7 @@ class _PollOptionRow extends StatelessWidget {
               child: Text(
                 label,
                 style: GoogleFonts.inter(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -3273,7 +3273,7 @@ class _PollOptionRow extends StatelessWidget {
             Text(
               '${(percent * 100).round()}%',
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
               ),
@@ -3286,7 +3286,7 @@ class _PollOptionRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: percent,
             minHeight: 6,
-            backgroundColor: AppTheme.border,
+            backgroundColor: AppTheme.borderFor(context),
             valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
           ),
         ),
@@ -3312,7 +3312,7 @@ class _AiSummaryPreview extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.auto_awesome_outlined,
             size: 16,
             color: AppTheme.primary,
@@ -3322,7 +3322,7 @@ class _AiSummaryPreview extends StatelessWidget {
             child: Text(
               summary,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 height: 1.45,
               ),
@@ -3350,7 +3350,7 @@ class _ModerationNotice extends StatelessWidget {
       child: Text(
         'This post is flagged for review. Treat the financial claims carefully.',
         style: GoogleFonts.inter(
-          color: AppTheme.textSecondary,
+          color: AppTheme.textSecondaryFor(context),
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
@@ -3377,7 +3377,7 @@ class _ForumPausedBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.pause_circle_outline_rounded,
             color: AppTheme.warning,
             size: 18,
@@ -3387,7 +3387,7 @@ class _ForumPausedBanner extends StatelessWidget {
             child: Text(
               message,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 height: 1.35,
@@ -3416,13 +3416,13 @@ class _SafeModeNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.shield_outlined, color: AppTheme.primary, size: 18),
+          Icon(Icons.shield_outlined, color: AppTheme.primary, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Safe mode is designed for sensitive money questions. Keep personal account numbers and passwords out of the post.',
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -3454,7 +3454,7 @@ class _GlassPanel extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: AppTheme.surface.withValues(alpha: 0.78),
+            color: AppTheme.surfaceFor(context).withValues(alpha: 0.78),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.54)),
             boxShadow: [
@@ -3488,10 +3488,10 @@ class _ForumAmbientBackground extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.background,
+            AppTheme.backgroundFor(context),
             const Color(0xFFEFF7FF),
             const Color(0xFFF7F4FF),
-            AppTheme.background,
+            AppTheme.backgroundFor(context),
           ],
           stops: const [0, 0.34, 0.68, 1],
         ),
@@ -3523,9 +3523,9 @@ class _PostCardSkeleton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3576,9 +3576,9 @@ class _CommentSkeletonList extends StatelessWidget {
       itemBuilder: (context, index) => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceCard,
+          color: AppTheme.surfaceCardFor(context),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
         ),
         child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -3612,7 +3612,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppTheme.border,
+        color: AppTheme.borderFor(context),
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -3651,7 +3651,7 @@ class _EmptyState extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
               ),
@@ -3661,7 +3661,7 @@ class _EmptyState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 13,
                 height: 1.4,
               ),
@@ -3687,7 +3687,7 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline_rounded,
               color: AppTheme.error,
               size: 38,
@@ -3697,7 +3697,7 @@ class _ErrorState extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.plusJakartaSans(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
               ),
@@ -3707,7 +3707,7 @@ class _ErrorState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 12,
                 height: 1.4,
               ),

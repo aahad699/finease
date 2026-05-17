@@ -22,8 +22,8 @@ class AnalyticsScreen extends StatelessWidget {
     final fs = context.watch<AuthService>().firestoreService;
 
     if (fs == null) {
-      return const Scaffold(
-        backgroundColor: AppTheme.background,
+      return Scaffold(
+        backgroundColor: AppTheme.backgroundFor(context),
         body: Center(
           child: CircularProgressIndicator(color: AppTheme.primary),
         ),
@@ -31,7 +31,7 @@ class AnalyticsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: StreamBuilder<List<FinancialTransaction>>(
         stream: fs.getTransactions(),
         builder: (context, snap) {
@@ -161,13 +161,13 @@ class AnalyticsScreen extends StatelessWidget {
       expandedHeight: 100,
       floating: false,
       pinned: true,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.surfaceFor(context),
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(
+        icon: Icon(
           Icons.arrow_back_ios_new_rounded,
           size: 18,
-          color: AppTheme.textPrimary,
+          color: AppTheme.textPrimaryFor(context),
         ),
         onPressed: () => Navigator.maybePop(context),
       ),
@@ -176,13 +176,13 @@ class AnalyticsScreen extends StatelessWidget {
         title: Text(
           'Analytics',
           style: GoogleFonts.inter(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontSize: 22,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,
           ),
         ),
-        background: Container(color: AppTheme.surface),
+        background: Container(color: AppTheme.surfaceFor(context)),
       ),
     );
   }
@@ -261,7 +261,7 @@ class _MonthlySummaryRow extends StatelessWidget {
           '$month Overview',
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -320,9 +320,9 @@ class _SummaryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -341,7 +341,7 @@ class _SummaryChip extends StatelessWidget {
             label,
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -384,9 +384,9 @@ class _ChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -411,14 +411,14 @@ class _ChartCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                     ),
                   ),
                   Text(
                     subtitle,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                     ),
                   ),
                 ],
@@ -541,7 +541,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                               entries[i].key,
                               style: GoogleFonts.inter(
                                 fontSize: 11,
-                                color: AppTheme.textSecondary,
+                                color: AppTheme.textSecondaryFor(context),
                                 fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -578,7 +578,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                 'Total Spent this Month',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -666,7 +666,7 @@ class _IncomeExpenseChartState extends State<_IncomeExpenseChart> {
                           widget.data[idx].month.split(' ').first,
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.textSecondaryFor(context),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -682,7 +682,7 @@ class _IncomeExpenseChartState extends State<_IncomeExpenseChart> {
                       _fmtK(value),
                       style: GoogleFonts.inter(
                         fontSize: 9,
-                        color: AppTheme.textHint,
+                        color: AppTheme.textHintFor(context),
                       ),
                     ),
                   ),
@@ -698,7 +698,7 @@ class _IncomeExpenseChartState extends State<_IncomeExpenseChart> {
                 show: true,
                 drawVerticalLine: false,
                 getDrawingHorizontalLine: (_) => FlLine(
-                  color: AppTheme.border,
+                  color: AppTheme.borderFor(context),
                   strokeWidth: 1,
                   dashArray: [4, 4],
                 ),
@@ -778,7 +778,7 @@ class _Legend extends StatelessWidget {
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondaryFor(context),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -842,7 +842,7 @@ class _WeeklyBarChartState extends State<_WeeklyBarChart> {
                   _fmtK(value),
                   style: GoogleFonts.inter(
                     fontSize: 9,
-                    color: AppTheme.textHint,
+                    color: AppTheme.textHintFor(context),
                   ),
                 ),
               ),
@@ -863,7 +863,7 @@ class _WeeklyBarChartState extends State<_WeeklyBarChart> {
                       label,
                       style: GoogleFonts.inter(
                         fontSize: 8,
-                        color: AppTheme.textHint,
+                        color: AppTheme.textHintFor(context),
                       ),
                     ),
                   );
@@ -881,7 +881,7 @@ class _WeeklyBarChartState extends State<_WeeklyBarChart> {
             show: true,
             drawVerticalLine: false,
             getDrawingHorizontalLine: (_) => FlLine(
-              color: AppTheme.border,
+              color: AppTheme.borderFor(context),
               strokeWidth: 1,
               dashArray: [4, 4],
             ),
@@ -960,14 +960,14 @@ class _AnalyticsSectionHeader extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimaryFor(context),
               ),
             ),
             Text(
               subtitle,
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
               ),
             ),
           ],
@@ -1022,7 +1022,7 @@ class _AnomalyCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimaryFor(context),
                       ),
                     ),
                     const Spacer(),
@@ -1051,7 +1051,7 @@ class _AnomalyCard extends StatelessWidget {
                   anomaly.message,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                     height: 1.5,
                   ),
                 ),
@@ -1083,9 +1083,9 @@ class _RecurringCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Row(
@@ -1096,7 +1096,7 @@ class _RecurringCard extends StatelessWidget {
               color: AppTheme.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.repeat_rounded,
               color: AppTheme.primary,
               size: 20,
@@ -1112,7 +1112,7 @@ class _RecurringCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimaryFor(context),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1120,7 +1120,7 @@ class _RecurringCard extends StatelessWidget {
                   '${expense.category} · Last: $dateStr',
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.textSecondaryFor(context),
                   ),
                 ),
               ],
@@ -1141,7 +1141,7 @@ class _RecurringCard extends StatelessWidget {
                 '/month',
                 style: GoogleFonts.inter(
                   fontSize: 10,
-                  color: AppTheme.textHint,
+                  color: AppTheme.textHintFor(context),
                 ),
               ),
             ],
@@ -1173,10 +1173,10 @@ class _AnalyticsEmptyState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppTheme.border,
+              color: AppTheme.borderFor(context),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, size: 28, color: AppTheme.textHint),
+            child: Icon(icon, size: 28, color: AppTheme.textHintFor(context)),
           ),
           const SizedBox(height: 12),
           Text(
@@ -1184,7 +1184,7 @@ class _AnalyticsEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textHint,
+              color: AppTheme.textHintFor(context),
               height: 1.6,
             ),
           ),

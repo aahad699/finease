@@ -75,7 +75,7 @@ class _CoachAdviceCardState extends State<CoachAdviceCard> {
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.auto_awesome_rounded,
+                  child: Icon(Icons.auto_awesome_rounded,
                       color: Colors.white, size: 22),
                 ),
                 const SizedBox(width: 12),
@@ -203,7 +203,7 @@ class _CoachAdviceCardState extends State<CoachAdviceCard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.chat_bubble_outline_rounded,
+                    Icon(Icons.chat_bubble_outline_rounded,
                         color: _primary, size: 18),
                     const SizedBox(width: 8),
                     Text(

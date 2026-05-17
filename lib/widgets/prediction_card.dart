@@ -4,6 +4,7 @@ import '../../models/transaction.dart';
 import '../../models/prediction_models.dart';
 import '../../services/prediction_service.dart';
 import '../pages/forecast/forecast_screen.dart';
+import '../theme/app_theme.dart';
 
 /// A home-screen card showing next-month predicted spending,
 /// per-category progress bars, and a red warning banner if any
@@ -73,7 +74,7 @@ class PredictionCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: hasWarnings
@@ -120,7 +121,7 @@ class PredictionCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(
+                  Icon(
                     Icons.arrow_forward_rounded,
                     size: 12,
                     color: _primary,

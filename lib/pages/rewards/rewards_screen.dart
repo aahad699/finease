@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../theme/app_theme.dart';
+
 class RewardsScreen extends StatelessWidget {
   const RewardsScreen({super.key});
 
@@ -9,7 +11,7 @@ class RewardsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FF),
+      backgroundColor: AppTheme.backgroundFor(context),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
@@ -28,13 +30,13 @@ class RewardsScreen extends StatelessWidget {
                 expandedHeight: 220,
                 floating: false,
                 pinned: true,
-                backgroundColor: const Color(0xFF15157D),
+                backgroundColor: AppTheme.primary,
                 automaticallyImplyLeading: true,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF15157D), Color(0xFF2E3192)],
+                        colors: [AppTheme.primary, AppTheme.secondary],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -45,7 +47,7 @@ class RewardsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'FinEdge',
                               style: TextStyle(
                                 color: Colors.white70,
@@ -54,7 +56,7 @@ class RewardsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
+                            Text(
                               'Rewards & Gamification',
                               style: TextStyle(
                                 color: Colors.white,
@@ -85,7 +87,7 @@ class RewardsScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Current Balance',
                                         style: TextStyle(
                                           color: Colors.white70,
@@ -96,7 +98,7 @@ class RewardsScreen extends StatelessWidget {
                                       const SizedBox(height: 4),
                                       Text(
                                         '$points pts',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 28,
                                           fontWeight: FontWeight.bold,
@@ -118,7 +120,7 @@ class RewardsScreen extends StatelessWidget {
                                     ),
                                     child: Text(
                                       'Level $level',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Color(0xFF00F2EA),
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Inter',
@@ -142,17 +144,18 @@ class RewardsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Active Challenges
-                      const Text(
+                      Text(
                         'Active Challenges',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0B1C30),
+                          color: AppTheme.textPrimaryFor(context),
                           fontFamily: 'Plus Jakarta Sans',
                         ),
                       ),
                       const SizedBox(height: 12),
                       _challengeCard(
+                        context,
                         'Complete a lesson',
                         "Read 'The Art of Compound Interest'",
                         Icons.menu_book_rounded,
@@ -160,6 +163,7 @@ class RewardsScreen extends StatelessWidget {
                         0.3,
                       ),
                       _challengeCard(
+                        context,
                         'Weekly Saver',
                         'Deposit at least 3000 PKR to your vault',
                         Icons.savings_rounded,
@@ -167,6 +171,7 @@ class RewardsScreen extends StatelessWidget {
                         0.6,
                       ),
                       _challengeCard(
+                        context,
                         'Daily Login',
                         'Come back tomorrow for your streak',
                         Icons.local_fire_department_rounded,
@@ -175,12 +180,12 @@ class RewardsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 28),
                       // Milestones
-                      const Text(
+                      Text(
                         'Milestones',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0B1C30),
+                          color: AppTheme.textPrimaryFor(context),
                           fontFamily: 'Plus Jakarta Sans',
                         ),
                       ),
@@ -188,9 +193,9 @@ class RewardsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppTheme.surfaceFor(context),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: AppTheme.borderFor(context)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,17 +203,17 @@ class RewardsScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Gold Tier Progress',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0B1C30),
+                                    color: AppTheme.textPrimaryFor(context),
                                     fontFamily: 'Plus Jakarta Sans',
                                   ),
                                 ),
                                 Text(
                                   '$points / $nextLevelPoints',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Color(0xFF777683),
                                     fontSize: 13,
                                     fontFamily: 'Inter',
@@ -227,7 +232,7 @@ class RewardsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               '"Consistency is the key to financial freedom."',
                               style: TextStyle(
                                 color: Color(0xFF777683),
@@ -241,17 +246,17 @@ class RewardsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 28),
                       // Digital milestones
-                      const Text(
+                      Text(
                         'Digital Milestones',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0B1C30),
+                          color: AppTheme.textPrimaryFor(context),
                           fontFamily: 'Plus Jakarta Sans',
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Points stay inside FinEase for engagement, learning, and streaks. They are not redeemable for gift cards, cash, or external perks.',
                         style: TextStyle(
                           color: Color(0xFF777683),
@@ -308,6 +313,7 @@ class RewardsScreen extends StatelessWidget {
   }
 
   Widget _challengeCard(
+    BuildContext context,
     String title,
     String subtitle,
     IconData icon,
@@ -318,9 +324,9 @@ class RewardsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Column(
         children: [
@@ -341,16 +347,16 @@ class RewardsScreen extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0B1C30),
+                        color: AppTheme.textPrimaryFor(context),
                         fontFamily: 'Plus Jakarta Sans',
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFF777683),
                         fontSize: 12,
                         fontFamily: 'Inter',
@@ -370,7 +376,7 @@ class RewardsScreen extends StatelessWidget {
                 ),
                 child: Text(
                   '+$reward pts',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFF006A66),
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -410,9 +416,9 @@ class RewardsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppTheme.borderFor(context)),
       ),
       child: Row(
         children: [
@@ -431,15 +437,15 @@ class RewardsScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0B1C30),
+                    color: AppTheme.textPrimaryFor(context),
                     fontFamily: 'Plus Jakarta Sans',
                   ),
                 ),
                 Text(
                   desc,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFF777683),
                     fontSize: 12,
                     fontFamily: 'Inter',
@@ -490,7 +496,7 @@ class RewardsScreen extends StatelessWidget {
             },
             child: Text(
               '$cost pts',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
                 fontFamily: 'Inter',

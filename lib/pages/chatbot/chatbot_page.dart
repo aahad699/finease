@@ -158,15 +158,15 @@ class _ChatbotPageState extends State<ChatbotPage> {
       blockedMessage: 'FinEase admin has temporarily paused the AI chatbot.',
       blockedIcon: Icons.smart_toy_outlined,
       child: Scaffold(
-        backgroundColor: AppTheme.background,
+        backgroundColor: AppTheme.backgroundFor(context),
         appBar: AppBar(
-          backgroundColor: AppTheme.surface,
+          backgroundColor: AppTheme.surfaceFor(context),
           elevation: 0,
           automaticallyImplyLeading: !widget.embedded,
           leading: widget.embedded
               ? null
               : IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18),
                   color: Colors.black,
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -178,7 +178,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   color: AppTheme.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.auto_awesome_rounded,
                   color: Colors.white,
                   size: 18,
@@ -193,7 +193,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textPrimaryFor(context),
                     ),
                   ),
                   Text(
@@ -209,9 +209,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.refresh_rounded,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
               ),
               onPressed: () => setState(() {
                 _messages
@@ -272,7 +272,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.surface,
+                              color: AppTheme.surfaceFor(context),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: AppTheme.primary.withValues(alpha: 0.3),
@@ -313,15 +313,15 @@ class _ConfigBlocker extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 520),
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: AppTheme.surfaceFor(context),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppTheme.border),
+            border: Border.all(color: AppTheme.borderFor(context)),
             boxShadow: AppTheme.softShadow,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.key_off_rounded,
                 color: AppTheme.error,
                 size: 44,
@@ -339,14 +339,14 @@ class _ConfigBlocker extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textSecondaryFor(context),
                   height: 1.5,
                 ),
               ),
               const SizedBox(height: 18),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded),
+                icon: Icon(Icons.refresh_rounded),
                 label: const Text('Recheck API Key'),
               ),
             ],
@@ -374,7 +374,7 @@ class _Bubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isUser ? AppTheme.primary : AppTheme.surface,
+          color: isUser ? AppTheme.primary : AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(18).copyWith(
             bottomRight: isUser
                 ? const Radius.circular(4)
@@ -384,13 +384,13 @@ class _Bubble extends StatelessWidget {
                 : const Radius.circular(4),
           ),
           boxShadow: AppTheme.softShadow,
-          border: isUser ? null : Border.all(color: AppTheme.border),
+          border: isUser ? null : Border.all(color: AppTheme.borderFor(context)),
         ),
         child: Text(
           message.text,
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: isUser ? Colors.white : AppTheme.textPrimary,
+            color: isUser ? Colors.white : AppTheme.textPrimaryFor(context),
             height: 1.5,
           ),
         ),
@@ -410,9 +410,9 @@ class _TypingIndicator extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: AppTheme.borderFor(context)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -430,7 +430,7 @@ class _TypingIndicator extends StatelessWidget {
               'Thinking...',
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
               ),
             ),
           ],
@@ -456,7 +456,7 @@ class _InputBar extends StatelessWidget {
         MediaQuery.of(context).padding.bottom + 12,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceFor(context),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -482,7 +482,7 @@ class _InputBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
-                fillColor: AppTheme.background,
+                fillColor: AppTheme.backgroundFor(context),
                 filled: true,
               ),
             ),
@@ -497,7 +497,7 @@ class _InputBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: AppTheme.cardShadow,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.send_rounded,
                 color: Colors.white,
                 size: 20,

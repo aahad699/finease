@@ -40,9 +40,9 @@ class SearchAndFilterCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -52,7 +52,7 @@ class SearchAndFilterCard extends StatelessWidget {
             controller: queryController,
             onChanged: onQueryChanged,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: Icon(Icons.search_rounded),
               suffixIcon: queryController.text.isEmpty
                   ? null
                   : IconButton(
@@ -60,7 +60,7 @@ class SearchAndFilterCard extends StatelessWidget {
                         queryController.clear();
                         onQueryChanged('');
                       },
-                      icon: const Icon(Icons.close_rounded),
+                      icon: Icon(Icons.close_rounded),
                     ),
               hintText:
                   'Search loans, insurance, jobs, rates, tags, or benefits',
@@ -106,11 +106,11 @@ class SearchAndFilterCard extends StatelessWidget {
                     labelStyle: GoogleFonts.inter(
                       color: selected
                           ? AppTheme.primary
-                          : AppTheme.textSecondary,
+                          : AppTheme.textSecondaryFor(context),
                       fontWeight: FontWeight.w700,
                     ),
                     side: BorderSide(
-                      color: selected ? AppTheme.primary : AppTheme.border,
+                      color: selected ? AppTheme.primary : AppTheme.borderFor(context),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
@@ -127,7 +127,7 @@ class SearchAndFilterCard extends StatelessWidget {
             Text(
               'Tags will appear as partners add richer product details.',
               style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondaryFor(context),
                 fontSize: 13,
               ),
             )
@@ -141,14 +141,14 @@ class SearchAndFilterCard extends StatelessWidget {
                   label: Text(tag),
                   selected: selected,
                   onSelected: (_) => onTagToggle(tag),
-                  backgroundColor: const Color(0xFFF8FAFC),
+                  backgroundColor: AppTheme.surfaceCardFor(context),
                   selectedColor: const Color(0xFFDCFCE7),
                   labelStyle: GoogleFonts.inter(
-                    color: selected ? AppTheme.success : AppTheme.textPrimary,
+                    color: selected ? AppTheme.success : AppTheme.textPrimaryFor(context),
                     fontWeight: FontWeight.w600,
                   ),
                   side: BorderSide(
-                    color: selected ? const Color(0xFF86EFAC) : AppTheme.border,
+                    color: selected ? const Color(0xFF86EFAC) : AppTheme.borderFor(context),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(999),
@@ -176,7 +176,7 @@ class _SectionLabel extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontWeight: FontWeight.w800,
           ),
         ),

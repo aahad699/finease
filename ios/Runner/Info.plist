@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to quickly and securely sign in to FinEase.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a profile picture for your FinEase account.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a profile picture for your FinEase account.</string>
 </dict>
 </plist>

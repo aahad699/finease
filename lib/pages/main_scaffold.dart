@@ -37,7 +37,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         );
         if (config.maintenanceMode) {
           return Scaffold(
-            backgroundColor: const Color(0xFFF8F9FF),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: AppBlockedView(
               title: '${config.brandName} is under maintenance',
               message: config.supportMessage,
@@ -96,7 +96,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2E3192).withValues(alpha: 0.08),
+                  color: AppTheme.primary.withValues(alpha: 0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -149,7 +149,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     IconData icon,
     String label, {
     bool enabled = true,
-    Color activeColor = const Color(0xFF2E3192),
+    Color activeColor = AppTheme.primary,
   }) {
     final isSelected = _selectedIndex == index;
     final color = isSelected
@@ -167,7 +167,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF2E3192).withValues(alpha: 0.08)
+              ? AppTheme.primary.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),

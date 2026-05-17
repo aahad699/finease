@@ -26,7 +26,7 @@ class PartnerDetailScreen extends StatelessWidget {
     final color = Color(partner.colorHex);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.backgroundFor(context),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -230,14 +230,14 @@ class PartnerDetailScreen extends StatelessWidget {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF8FAFC),
+                                  color: AppTheme.surfaceCardFor(context),
                                   borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: AppTheme.border),
+                                  border: Border.all(color: AppTheme.borderFor(context)),
                                 ),
                                 child: Text(
                                   tag,
                                   style: GoogleFonts.inter(
-                                    color: AppTheme.textPrimary,
+                                    color: AppTheme.textPrimaryFor(context),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                   ),
@@ -275,8 +275,8 @@ void _showApplyOptions(
           bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
         ),
         child: Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.background,
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundFor(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.all(18),
@@ -287,7 +287,7 @@ void _showApplyOptions(
               Text(
                 'How would you like to proceed?',
                 style: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.textPrimaryFor(context),
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
                 ),
@@ -335,124 +335,6 @@ void _showApplyOptions(
       );
     },
   );
-}
-
-Future<void> _showInAppApplicationForm(
-  BuildContext context,
-  MarketplacePartner partner,
-  FirestoreService firestoreService,
-) async {
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  try {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
-          ),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: AppTheme.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Start application for ${partner.name}',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'FinEase will save this as a marketplace lead so you can continue the journey in-app later.',
-                  style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Full name'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone or contact',
-                  ),
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final name = nameController.text.trim();
-                      final phone = phoneController.text.trim();
-                      if (name.isEmpty || phone.isEmpty) {
-                        ScaffoldMessenger.of(sheetContext).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please fill name and contact.'),
-                          ),
-                        );
-                        return;
-                      }
-                      await firestoreService.logMarketplaceEvent(
-                        'partner_inapp_application_started',
-                        payload: {'partnerId': partner.id},
-                      );
-                      final lead = await firestoreService.createMarketplaceLead(
-                        partnerId: partner.id,
-                        partnerName: partner.name,
-                        category: partner.category,
-                        applicantName: name,
-                        contact: phone,
-                        context: {
-                          'rateLabel': partner.rateLabel,
-                          'approvalSpeed': partner.approvalSpeed,
-                          'trustScore': partner.trustScore,
-                        },
-                      );
-                      await firestoreService.logMarketplaceEvent(
-                        'partner_inapp_application_submitted',
-                        payload: {'partnerId': partner.id, 'leadId': lead.id},
-                      );
-                      if (!sheetContext.mounted) return;
-                      Navigator.pop(sheetContext);
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Application started for ${partner.name}',
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text('Start application'),
-                  ),
-                ),
-                const SizedBox(height: 14),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  } finally {
-    nameController.dispose();
-    phoneController.dispose();
-  }
 }
 
 class _TopChip extends StatelessWidget {
@@ -531,9 +413,9 @@ class _TrustLayerCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -542,7 +424,7 @@ class _TrustLayerCard extends StatelessWidget {
           Text(
             'Trust layer',
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w800,
               fontSize: 18,
             ),
@@ -698,9 +580,9 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.borderFor(context)),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -709,7 +591,7 @@ class _SectionCard extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w800,
               fontSize: 18,
             ),
@@ -734,7 +616,7 @@ class _SnapshotItem extends StatelessWidget {
       width: MediaQuery.of(context).size.width > 420 ? 160 : double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -743,7 +625,7 @@ class _SnapshotItem extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
             ),
           ),
@@ -751,7 +633,7 @@ class _SnapshotItem extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -775,7 +657,7 @@ class _BulletList extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimaryFor(context),
             fontWeight: FontWeight.w700,
             fontSize: 15,
           ),
@@ -791,7 +673,7 @@ class _BulletList extends StatelessWidget {
                   width: 8,
                   height: 8,
                   margin: const EdgeInsets.only(top: 6),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.primary,
                     shape: BoxShape.circle,
                   ),
@@ -801,7 +683,7 @@ class _BulletList extends StatelessWidget {
                   child: Text(
                     item,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondaryFor(context),
                       height: 1.45,
                     ),
                   ),
@@ -827,7 +709,7 @@ class _TrustMetric extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppTheme.surfaceCardFor(context),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -836,7 +718,7 @@ class _TrustMetric extends StatelessWidget {
           Text(
             label,
             style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textSecondaryFor(context),
               fontSize: 12,
             ),
           ),
@@ -844,7 +726,7 @@ class _TrustMetric extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.plusJakartaSans(
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimaryFor(context),
               fontWeight: FontWeight.w700,
             ),
           ),

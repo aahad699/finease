@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/transaction.dart';
 import '../../models/prediction_models.dart';
 import '../../services/prediction_service.dart';
+import '../../theme/app_theme.dart';
 
 class ForecastScreen extends StatefulWidget {
   final List<FinancialTransaction> transactions;
@@ -51,8 +52,9 @@ class _ForecastScreenState extends State<ForecastScreen>
     _warnings = _svc.getBudgetWarnings(currentMonth, widget.budgets);
 
     _anim = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800))
-      ..forward();
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
   }
 
   @override
@@ -67,18 +69,26 @@ class _ForecastScreenState extends State<ForecastScreen>
     final months = <_MonthBar>[];
     for (int offset = 3; offset >= 1; offset--) {
       final dt = _monthOffset(now, -offset);
-      final total = _svc.getTotalForMonth(widget.transactions, dt.year, dt.month);
-      months.add(_MonthBar(
-        label: _monthAbbr(dt.month),
-        amount: total,
-        isPrediction: false,
-      ));
+      final total = _svc.getTotalForMonth(
+        widget.transactions,
+        dt.year,
+        dt.month,
+      );
+      months.add(
+        _MonthBar(
+          label: _monthAbbr(dt.month),
+          amount: total,
+          isPrediction: false,
+        ),
+      );
     }
-    months.add(_MonthBar(
-      label: 'Next\n${_monthAbbr(_monthOffset(now, 1).month)}',
-      amount: _forecast.totalPredicted,
-      isPrediction: true,
-    ));
+    months.add(
+      _MonthBar(
+        label: 'Next\n${_monthAbbr(_monthOffset(now, 1).month)}',
+        amount: _forecast.totalPredicted,
+        isPrediction: true,
+      ),
+    );
     return months;
   }
 
@@ -88,7 +98,7 @@ class _ForecastScreenState extends State<ForecastScreen>
     final maxVal = bars.map((b) => b.amount).fold(0.0, (a, b) => a > b ? a : b);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FF),
+      backgroundColor: AppTheme.backgroundFor(context),
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -103,25 +113,34 @@ class _ForecastScreenState extends State<ForecastScreen>
                 const SizedBox(height: 20),
 
                 // ── Monthly bar chart ───────────────────────────────────
-                _sectionHeader(Icons.bar_chart_rounded, 'Monthly Overview',
-                    'Last 3 months + forecast'),
+                _sectionHeader(
+                  Icons.bar_chart_rounded,
+                  'Monthly Overview',
+                  'Last 3 months + forecast',
+                ),
                 const SizedBox(height: 12),
                 _buildBarChart(bars, maxVal),
                 const SizedBox(height: 24),
 
                 // ── Budget warnings ─────────────────────────────────────
                 if (_warnings.isNotEmpty) ...[
-                  _sectionHeader(Icons.warning_amber_rounded, 'Budget Alerts',
-                      '${_warnings.length} at risk',
-                      iconColor: _danger),
+                  _sectionHeader(
+                    Icons.warning_amber_rounded,
+                    'Budget Alerts',
+                    '${_warnings.length} at risk',
+                    iconColor: _danger,
+                  ),
                   const SizedBox(height: 12),
                   ..._warnings.map(_buildWarningTile),
                   const SizedBox(height: 24),
                 ],
 
                 // ── Category prediction table ───────────────────────────
-                _sectionHeader(Icons.table_chart_rounded,
-                    'Category Predictions', 'Weighted 3-month forecast'),
+                _sectionHeader(
+                  Icons.table_chart_rounded,
+                  'Category Predictions',
+                  'Weighted 3-month forecast',
+                ),
                 const SizedBox(height: 12),
                 _buildCategoryTable(),
                 const SizedBox(height: 24),
@@ -135,45 +154,50 @@ class _ForecastScreenState extends State<ForecastScreen>
 
   // ── AppBar ─────────────────────────────────────────────────────────────────
   SliverAppBar _buildAppBar() => SliverAppBar(
-        expandedHeight: 120,
-        floating: false,
-        pinned: true,
-        backgroundColor: _primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
+    expandedHeight: 120,
+    floating: false,
+    pinned: true,
+    backgroundColor: _primary,
+    leading: IconButton(
+      icon: Icon(
+        Icons.arrow_back_ios_new_rounded,
+        color: Colors.white,
+        size: 20,
+      ),
+      onPressed: () => Navigator.pop(context),
+    ),
+    flexibleSpace: FlexibleSpaceBar(
+      titlePadding: const EdgeInsets.fromLTRB(20, 0, 0, 16),
+      title: Text(
+        'Spending Forecast',
+        style: GoogleFonts.plusJakartaSans(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
         ),
-        flexibleSpace: FlexibleSpaceBar(
-          titlePadding: const EdgeInsets.fromLTRB(20, 0, 0, 16),
-          title: Text(
-            'Spending Forecast',
-            style: GoogleFonts.plusJakartaSans(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          background: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF2E3192), Color(0xFF4B5BD6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 20, top: 20),
-                child: Icon(Icons.auto_graph_rounded,
-                    size: 64,
-                    color: Colors.white.withValues(alpha: 0.08)),
-              ),
-            ),
+      ),
+      background: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF2E3192), Color(0xFF4B5BD6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-      );
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 20, top: 20),
+            child: Icon(
+              Icons.auto_graph_rounded,
+              size: 64,
+              color: Colors.white.withValues(alpha: 0.08),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 
   // ── Savings Card ───────────────────────────────────────────────────────────
   Widget _buildSavingsCard() {
@@ -209,9 +233,10 @@ class _ForecastScreenState extends State<ForecastScreen>
                 Text(
                   'Projected Savings',
                   style: GoogleFonts.inter(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500),
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -229,8 +254,9 @@ class _ForecastScreenState extends State<ForecastScreen>
                       ? '${pct.toStringAsFixed(1)}% of your monthly income'
                       : 'You\'re spending more than you earn',
                   style: GoogleFonts.inter(
-                      color: Colors.white.withValues(alpha: 0.75),
-                      fontSize: 12),
+                    color: Colors.white.withValues(alpha: 0.75),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -261,7 +287,7 @@ class _ForecastScreenState extends State<ForecastScreen>
         height: 250,
         padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceFor(context),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -294,14 +320,16 @@ class _ForecastScreenState extends State<ForecastScreen>
                       });
                     },
                     touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (g) =>
-                          bars[g.x.toInt()].isPrediction ? _predColor : _primary,
+                      getTooltipColor: (g) => bars[g.x.toInt()].isPrediction
+                          ? _predColor
+                          : _primary,
                       getTooltipItem: (group, gi, rod, ri) => BarTooltipItem(
                         'PKR ${PredictionService.fmt(rod.toY)}',
                         GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600),
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -313,7 +341,9 @@ class _ForecastScreenState extends State<ForecastScreen>
                         getTitlesWidget: (v, _) => Text(
                           _fmtK(v),
                           style: const TextStyle(
-                              fontSize: 9, color: Color(0xFF94A3B8)),
+                            fontSize: 9,
+                            color: Color(0xFF94A3B8),
+                          ),
                         ),
                       ),
                     ),
@@ -346,17 +376,20 @@ class _ForecastScreenState extends State<ForecastScreen>
                       ),
                     ),
                     rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
                     getDrawingHorizontalLine: (_) => FlLine(
-                        color: const Color(0xFFE2E8F0),
-                        strokeWidth: 1,
-                        dashArray: [4, 4]),
+                      color: const Color(0xFFE2E8F0),
+                      strokeWidth: 1,
+                      dashArray: [4, 4],
+                    ),
                   ),
                   borderData: FlBorderData(show: false),
                   barGroups: List.generate(bars.length, (i) {
@@ -370,22 +403,23 @@ class _ForecastScreenState extends State<ForecastScreen>
                           toY: animVal,
                           width: isTouched ? 20 : 16,
                           borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(8)),
+                            top: Radius.circular(8),
+                          ),
                           gradient: LinearGradient(
                             colors: bar.isPrediction
                                 ? [
                                     _predColor.withValues(alpha: 0.7),
-                                    _predColor
+                                    _predColor,
                                   ]
                                 : isTouched
-                                    ? [
-                                        const Color(0xFF4B5BD6),
-                                        const Color(0xFF2E3192)
-                                      ]
-                                    : [
-                                        const Color(0xFF818CF8),
-                                        const Color(0xFF4B5BD6)
-                                      ],
+                                ? [
+                                    const Color(0xFF4B5BD6),
+                                    const Color(0xFF2E3192),
+                                  ]
+                                : [
+                                    const Color(0xFF818CF8),
+                                    const Color(0xFF4B5BD6),
+                                  ],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                           ),
@@ -428,10 +462,11 @@ class _ForecastScreenState extends State<ForecastScreen>
                 child: Text(
                   w.message,
                   style: GoogleFonts.inter(
-                      fontSize: 12.5,
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                      height: 1.4),
+                    fontSize: 12.5,
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
                 ),
               ),
             ],
@@ -443,12 +478,16 @@ class _ForecastScreenState extends State<ForecastScreen>
               Text(
                 'Spent: PKR ${PredictionService.fmt(w.currentSpend)}',
                 style: GoogleFonts.inter(
-                    fontSize: 11, color: const Color(0xFF64748B)),
+                  fontSize: 11,
+                  color: const Color(0xFF64748B),
+                ),
               ),
               Text(
                 'Budget: PKR ${PredictionService.fmt(w.budget)}',
                 style: GoogleFonts.inter(
-                    fontSize: 11, color: const Color(0xFF64748B)),
+                  fontSize: 11,
+                  color: const Color(0xFF64748B),
+                ),
               ),
             ],
           ),
@@ -468,9 +507,10 @@ class _ForecastScreenState extends State<ForecastScreen>
               child: Text(
                 'Projected overspend: PKR ${PredictionService.fmt(w.projectedOverspend)}',
                 style: GoogleFonts.inter(
-                    fontSize: 10.5,
-                    color: _danger,
-                    fontWeight: FontWeight.w600),
+                  fontSize: 10.5,
+                  color: _danger,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
         ],
@@ -485,7 +525,7 @@ class _ForecastScreenState extends State<ForecastScreen>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surfaceFor(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -500,46 +540,58 @@ class _ForecastScreenState extends State<ForecastScreen>
           // Table header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFEEF2FF),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceCardFor(context),
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Row(
               children: [
                 Expanded(
                   flex: 3,
-                  child: Text('Category',
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: _primary)),
+                  child: Text(
+                    'Category',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _primary,
+                    ),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Predicted',
-                      textAlign: TextAlign.right,
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: _primary)),
+                  child: Text(
+                    'Predicted',
+                    textAlign: TextAlign.right,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _primary,
+                    ),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Budget',
-                      textAlign: TextAlign.right,
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: _primary)),
+                  child: Text(
+                    'Budget',
+                    textAlign: TextAlign.right,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _primary,
+                    ),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text('Status',
-                      textAlign: TextAlign.right,
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: _primary)),
+                  child: Text(
+                    'Status',
+                    textAlign: TextAlign.right,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _primary,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -554,28 +606,30 @@ class _ForecastScreenState extends State<ForecastScreen>
             final isOver = budget != null && pred > budget;
 
             return Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: i.isEven ? Colors.white : const Color(0xFFF8F9FF),
+                color: i.isEven
+                    ? AppTheme.surfaceFor(context)
+                    : AppTheme.surfaceCardFor(context),
                 borderRadius: isLast
-                    ? const BorderRadius.vertical(
-                        bottom: Radius.circular(20))
+                    ? const BorderRadius.vertical(bottom: Radius.circular(20))
                     : null,
                 border: !isLast
-                    ? const Border(
-                        bottom: BorderSide(color: Color(0xFFF1F5F9)))
+                    ? Border(bottom: BorderSide(color: AppTheme.borderFor(context)))
                     : null,
               ),
               child: Row(
                 children: [
                   Expanded(
                     flex: 3,
-                    child: Text(cat,
-                        style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1E293B))),
+                    child: Text(
+                      cat,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimaryFor(context),
+                      ),
+                    ),
                   ),
                   Expanded(
                     flex: 2,
@@ -583,9 +637,10 @@ class _ForecastScreenState extends State<ForecastScreen>
                       'PKR ${PredictionService.fmt(pred)}',
                       textAlign: TextAlign.right,
                       style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: isOver ? _danger : _primary),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isOver ? _danger : _primary,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -596,8 +651,9 @@ class _ForecastScreenState extends State<ForecastScreen>
                           : '—',
                       textAlign: TextAlign.right,
                       style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xFF94A3B8)),
+                        fontSize: 12,
+                        color: const Color(0xFF94A3B8),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -606,29 +662,31 @@ class _ForecastScreenState extends State<ForecastScreen>
                       alignment: Alignment.centerRight,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: budget == null
                               ? const Color(0xFFF1F5F9)
                               : isOver
-                                  ? _danger.withValues(alpha: 0.12)
-                                  : _success.withValues(alpha: 0.12),
+                              ? _danger.withValues(alpha: 0.12)
+                              : _success.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           budget == null
                               ? 'No budget'
                               : isOver
-                                  ? 'Over'
-                                  : 'OK',
+                              ? 'Over'
+                              : 'OK',
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: budget == null
                                 ? const Color(0xFF64748B)
                                 : isOver
-                                    ? _danger
-                                    : _success,
+                                ? _danger
+                                : _success,
                           ),
                         ),
                       ),
@@ -645,8 +703,12 @@ class _ForecastScreenState extends State<ForecastScreen>
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  Widget _sectionHeader(IconData icon, String title, String subtitle,
-      {Color iconColor = _primary}) {
+  Widget _sectionHeader(
+    IconData icon,
+    String title,
+    String subtitle, {
+    Color iconColor = _primary,
+  }) {
     return Row(
       children: [
         Container(
@@ -661,14 +723,21 @@ class _ForecastScreenState extends State<ForecastScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1E293B))),
-            Text(subtitle,
-                style: GoogleFonts.inter(
-                    fontSize: 12, color: const Color(0xFF64748B))),
+            Text(
+              title,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimaryFor(context),
+              ),
+            ),
+            Text(
+              subtitle,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: const Color(0xFF64748B),
+              ),
+            ),
           ],
         ),
       ],
@@ -678,15 +747,32 @@ class _ForecastScreenState extends State<ForecastScreen>
   DateTime _monthOffset(DateTime base, int months) {
     int m = base.month + months;
     int y = base.year;
-    while (m <= 0) { m += 12; y--; }
-    while (m > 12) { m -= 12; y++; }
+    while (m <= 0) {
+      m += 12;
+      y--;
+    }
+    while (m > 12) {
+      m -= 12;
+      y++;
+    }
     final maxDay = DateTime(y, m + 1, 0).day;
     return DateTime(y, m, base.day.clamp(1, maxDay));
   }
 
-  String _monthAbbr(int m) =>
-      const ['Jan','Feb','Mar','Apr','May','Jun',
-             'Jul','Aug','Sep','Oct','Nov','Dec'][m - 1];
+  String _monthAbbr(int m) => const [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ][m - 1];
 
   String _fmtK(double v) =>
       v >= 1000 ? '${(v / 1000).toStringAsFixed(0)}k' : v.toStringAsFixed(0);
@@ -698,10 +784,11 @@ class _MonthBar {
   final String label;
   final double amount;
   final bool isPrediction;
-  const _MonthBar(
-      {required this.label,
-      required this.amount,
-      required this.isPrediction});
+  const _MonthBar({
+    required this.label,
+    required this.amount,
+    required this.isPrediction,
+  });
 }
 
 class _LegendDot extends StatelessWidget {
@@ -711,19 +798,25 @@ class _LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                  color: color, borderRadius: BorderRadius.circular(3))),
-          const SizedBox(width: 5),
-          Text(label,
-              style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: const Color(0xFF64748B),
-                  fontWeight: FontWeight.w500)),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+      const SizedBox(width: 5),
+      Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          color: const Color(0xFF64748B),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ],
+  );
 }
